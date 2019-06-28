@@ -17,9 +17,14 @@ namespace QuizResults
 
 		static void Main(string[] args)
 		{
-			var parser = new Parser();
+			var parser = new CsvParser();
 			var config = BuildConfiguration();
 			var data = parser.ParseFile(config["DataFilePath"]);
+			if (parser.ErrorMessage != null)
+			{
+				Console.WriteLine("Parsing failed");
+				Console.WriteLine(parser.ErrorMessage);
+			}
 		}
 	}
 }

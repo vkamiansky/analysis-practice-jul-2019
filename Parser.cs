@@ -6,9 +6,25 @@ using QuizResults.Models;
 
 namespace QuizResults
 {
-	public class Parser
+	public class CsvParser
 	{
+		/// <summary>
+		/// Null when everything is OK
+		/// </summary>
+		public string ErrorMessage { get; private set; }
+
+		/// <summary>
+		/// Last read line number
+		/// </summary>
+		public int CurrentLineNumber { get; private set; }
+
 		private StreamReader _reader;
+
+		private string ReadLine()
+		{
+			CurrentLineNumber++;
+			return _reader.ReadLine();
+		}
 
 		private bool IsEmail(string txt)
 		{
@@ -18,53 +34,69 @@ namespace QuizResults
 				   !txt.Contains(" ");
 		}
 
-		private Test ReadTest()
+		private PersonTestResult ReadTest()
 		{
 			// Read email
-			var line = _reader.ReadLine();
+			var line = ReadLine();
 			var lineStart = "Email: ";
 			if (!line.Contains(lineStart))
 				return null;
 			var email = line.Substring(line.IndexOf(lineStart) + lineStart.Length);
 			if (!IsEmail(email))
-				throw new FormatException("Incorrect email: " + email);
+			{
+				ErrorMessage = string.Format("Incorrect email {0} at the line {1}", email, CurrentLineNumber);
+				return null;
+			}
 
 			// Read user name
-			line = _reader.ReadLine();
+			line = ReadLine();
 			lineStart = "Имя: ";
 			if (!line.StartsWith(lineStart))
-				throw new FormatException("Incorrect format: name expected");
+			{
+				ErrorMessage = string.Format("Incorrect format: name expected at the line {0}", CurrentLineNumber);
+				return null;
+			}
 			var name = line.Substring(lineStart.Length);
 
 			// Read notes
-			line = _reader.ReadLine();
+			line = ReadLine();
 			string notes = null;
 			lineStart = "Заметки: ";
 			if (!line.StartsWith(lineStart))
-				throw new FormatException("Incorrect format: notes expected");
+			{
+				ErrorMessage = string.Format("Incorrect format: notes expected at the line {0}", CurrentLineNumber);
+				return null;
+			}
+
 			// If this field is not empty
 			if (line.Length > lineStart.Length)
 				notes = line.Substring(lineStart.Length);
 
 			// Notes may consist of several lines
-			line = _reader.ReadLine();
+			line = ReadLine();
 			while (!line.StartsWith("Общий результат(%): "))
 			{
 				notes += Environment.NewLine + line;
-				line = _reader.ReadLine();
+				line = ReadLine();
 			}
 
 			// Read test result
 			lineStart = "Общий результат(%): ";
 			if (!line.StartsWith(lineStart))
-				throw new FormatException("Incorrect format: result expected");
+			{
+				ErrorMessage = string.Format("Incorrect format: result expected at the line {0}", CurrentLineNumber);
+				return null;
+			}
 			var resultStr = line.Substring(lineStart.Length);
 			if (!uint.TryParse(resultStr, out uint result))
-				throw new FormatException("Incorrect result: " + resultStr);
+			{
+				ErrorMessage = string.Format("Incorrect result {0} at the line {1}", resultStr, CurrentLineNumber);
+				return null;
+			}
 
 			// Skip 3 lines
 			for (var i = 0; i < 3; i++)
-				_reader.ReadLine();
+				ReadLine();
 
 			// Read 5 (or more) questions
 			var answers = new List<Answer>(5);
@@ -76,7 +108,7 @@ namespace QuizResults
 				answers.Add(answer);
 
 				// Skip empty line after question
-				_reader.ReadLine();
+				ReadLine();
 			}
 
 			var person = new Person
@@ -85,7 +117,7 @@ namespace QuizResults
 				Email = email
 			};
 
-			return new Test
+			return new PersonTestResult
 			{
 				Person = person,
 				Answers = answers,
@@ -97,7 +129,7 @@ namespace QuizResults
 		private Answer ReadAnswer()
 		{
 			// Get question
-			var line = _reader.ReadLine();
+			var line = ReadLine();
 			if (line == null)
 				return null;
 			var lineStart = "Вопрос: ";
@@ -111,7 +143,7 @@ namespace QuizResults
 			var list = new List<string>(4);
 			for (uint i = 0; i < 4; i++)
 			{
-				line = _reader.ReadLine();
+				line = ReadLine();
 				var answer = line.Substring(line.LastIndexOf(')') + 1);
 				list.Add(answer);
 				if (line.Contains("(+)"))
@@ -120,9 +152,15 @@ namespace QuizResults
 					userAnswerIndex = i;
 			}
 			if (!correctAnswerIndex.HasValue)
-				throw new FormatException("Question with no correct answer");
+			{
+				ErrorMessage = string.Format("Question with no correct answer at the line {0}", CurrentLineNumber);
+				return null;
+			}
 			if (!userAnswerIndex.HasValue)
-				throw new FormatException("Qustion with no user answer");
+			{
+				ErrorMessage = string.Format("Qustion with no user answer at the line {0}", CurrentLineNumber);
+				return null;
+			}
 
 			var question = new Question
 			{
@@ -138,12 +176,14 @@ namespace QuizResults
 			};
 		}
 
-		public List<Test> ParseFile(string path)
+		public IEnumerable<PersonTestResult> ParseFile(string path)
 		{
-			var result = new List<Test>();
+			var result = new List<PersonTestResult>();
 			using (_reader = new StreamReader(path))
 			{
-				_reader.ReadLine();
+				CurrentLineNumber = -1;
+				ErrorMessage = null;
+				ReadLine();
 				while (!_reader.EndOfStream)
 				{
 					var test = ReadTest();
