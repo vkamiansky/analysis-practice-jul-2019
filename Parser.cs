@@ -158,7 +158,7 @@ namespace QuizResults
 			}
 			if (!userAnswerIndex.HasValue)
 			{
-				ErrorMessage = string.Format("Qustion with no user answer at the line {0}", CurrentLineNumber);
+				ErrorMessage = string.Format("Question with no user answer at the line {0}", CurrentLineNumber);
 				return null;
 			}
 
@@ -179,7 +179,8 @@ namespace QuizResults
 		public IEnumerable<PersonTestResult> ParseFile(string path)
 		{
 			var result = new List<PersonTestResult>();
-			using (_reader = new StreamReader(path))
+			Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+			using (_reader = new StreamReader(path, Encoding.GetEncoding(866)))
 			{
 				CurrentLineNumber = -1;
 				ErrorMessage = null;
@@ -188,7 +189,7 @@ namespace QuizResults
 				{
 					var test = ReadTest();
 					if (test == null)
-						break;
+						continue;
 					result.Add(test);
 				}
 			}
