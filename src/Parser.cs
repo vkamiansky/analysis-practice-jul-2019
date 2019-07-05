@@ -178,9 +178,14 @@ namespace QuizResults
 
 		public IEnumerable<PersonTestResult> ParseFile(string path)
 		{
+			return ParseStream(new FileStream(path, FileMode.Open));
+		}
+
+		public IEnumerable<PersonTestResult> ParseStream(Stream stream)
+		{
 			var result = new List<PersonTestResult>();
 			Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-			using (_reader = new StreamReader(path, Encoding.GetEncoding(866)))
+			using (_reader = new StreamReader(stream, Encoding.GetEncoding(866)))
 			{
 				CurrentLineNumber = -1;
 				ErrorMessage = null;

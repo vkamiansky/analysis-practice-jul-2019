@@ -9,9 +9,9 @@ using System.Text;
 
 namespace QuizResults.Tests
 {
-	public class CsvParserTests
-	{
-		private const string testResultsDataString = 
+    public class CsvParserTests
+    {
+        private const string testResultsDataString =
 @"""Subject"",""Body"",""From: (Name)"",""From: (Address)"",""From: (Type)"",""To: (Name)"",""To: (Address)"",""To: (Type)"",""CC: (Name)"",""CC: (Address)"",""CC: (Type)"",""BCC: (Name)"",""BCC: (Address)"",""BCC: (Type)"",""Billing Information"",""Categories"",""Importance"",""Mileage"",""Sensitivity""
 ""Результаты Иван"",""Email: email@site.com
 Имя: Иван
@@ -50,132 +50,138 @@ namespace QuizResults.Tests
 (+)ничего
 (-)undefined
 ";
-		internal void CompareAnswers(Answer expected, Answer actual)
-		{
-			Assert.Equal(expected.Question.QuestionText, actual.Question.QuestionText);
-			Assert.Equal(expected.Question.AnswersList.Count, actual.Question.AnswersList.Count);
-			for (var i = 0; i < actual.Question.AnswersList.Count; i++)
-			{
-				Assert.Equal(expected.Question.AnswersList.ElementAt(i), actual.Question.AnswersList.ElementAt(i));
-			}
-			Assert.Equal(expected.AnswerIndex, actual.AnswerIndex);
-			Assert.Equal(expected.Question.CorrectAnswerIndex, actual.Question.CorrectAnswerIndex);
-		}
+        internal void CompareAnswers(Answer expected, Answer actual)
+        {
+            Assert.Equal(expected.Question.QuestionText, actual.Question.QuestionText);
+            Assert.Equal(expected.Question.AnswersList.Count, actual.Question.AnswersList.Count);
+            for (var i = 0; i < actual.Question.AnswersList.Count; i++)
+            {
+                Assert.Equal(expected.Question.AnswersList.ElementAt(i), actual.Question.AnswersList.ElementAt(i));
+            }
+            Assert.Equal(expected.AnswerIndex, actual.AnswerIndex);
+            Assert.Equal(expected.Question.CorrectAnswerIndex, actual.Question.CorrectAnswerIndex);
+        }
 
-		[Fact]
-		public void OneCorrectTest()
-		{
-			var parser = new CsvParser();
-			var data = parser.ParseFile("Tests/OneCorrectTest.txt");
+        [Fact]
+        public void OneCorrectTest()
+        {
+            var parser = new CsvParser();
+            var bytes = new byte[] { };
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+			
+            using (var stream = new MemoryStream())
+            {
+                using (var writer = new StreamWriter(stream, Encoding.GetEncoding(866)))
+                {
+                    writer.Write(testResultsDataString);
+                }
+                bytes = stream.ToArray();
+            }
 
-			Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-			using(var stream = new MemoryStream())
-			{
-				using(var writer = new StreamWriter(stream, Encoding.GetEncoding(866)))
-				{
+            using (var stream = new MemoryStream(bytes))
+            {
+                var data = parser.ParseStream(stream);
+                Assert.Single(data);
+                var test = data.First();
 
-				}
-			}
+                Assert.Equal("email@site.com", test.Person.Email);
+                Assert.Equal("Иван", test.Person.Name);
+                Assert.Null(test.Notes);
+                Assert.Equal((uint)60, test.Result);
 
-			Assert.Single(data);
-			var test = data.First();
+                Assert.Equal(5, test.Answers.Count);
 
-			Assert.Equal("email@site.com", test.Person.Email);
-			Assert.Equal("Иван", test.Person.Name);
-			Assert.Null(test.Notes);
-			Assert.Equal((uint)60, test.Result);
+                var expected = new Answer
+                {
+                    Question = new Question
+                    {
+                        QuestionText = "Мейстеры Цитадели изобрели бургеры и спешат поделиться своим открытием со всеми. Но так ли хорош рецепт?",
+                        AnswersList = new List<string>
+                    {
+                        "bread bread burger cheese",
+                        "bread burger cheese bread",
+                        "bread burger bread cheese",
+                        "burger cheese bread bread"
+                    },
+                        CorrectAnswerIndex = 2
+                    },
+                    AnswerIndex = 2
+                };
+                CompareAnswers(expected, test.Answers.ElementAt(0));
 
-			Assert.Equal(5, test.Answers.Count);
+                expected = new Answer
+                {
+                    Question = new Question
+                    {
+                        QuestionText = "Багет - это хлеб, а хлеб ? это багет?",
+                        AnswersList = new List<string>
+                    {
+                        "undefined true",
+                        "false true",
+                        "true true",
+                        "true undefined"
+                    },
+                        CorrectAnswerIndex = 0
+                    },
+                    AnswerIndex = 3
+                };
+                CompareAnswers(expected, test.Answers.ElementAt(1));
 
-			var expected = new Answer
-			{
-				Question = new Question
-				{
-					QuestionText = "Мейстеры Цитадели изобрели бургеры и спешат поделиться своим открытием со всеми. Но так ли хорош рецепт?",
-					AnswersList = new List<string>
-					{
-						"bread bread burger cheese",
-						"bread burger cheese bread",
-						"bread burger bread cheese",
-						"burger cheese bread bread"
-					},
-					CorrectAnswerIndex = 2
-				},
-				AnswerIndex = 2
-			};
-			CompareAnswers(expected, test.Answers.ElementAt(0));
+                expected = new Answer
+                {
+                    Question = new Question
+                    {
+                        QuestionText = "Путник знает, что и как заказать в таверне.",
+                        AnswersList = new List<string>
+                    {
+                        "[ 'bacon and eggs' ]",
+                        "[ 'bacon and eggs', 'coffee' ]",
+                        "[ 'coffee', 'bacon and eggs' ]",
+                        "SyntaxError: Unexpected token"
+                    },
+                        CorrectAnswerIndex = 0
+                    },
+                    AnswerIndex = 0
+                };
+                CompareAnswers(expected, test.Answers.ElementAt(2));
 
-			expected = new Answer
-			{
-				Question = new Question
-				{
-					QuestionText = "Багет - это хлеб, а хлеб ? это багет?",
-					AnswersList = new List<string>
-					{
-						"undefined true",
-						"false true",
-						"true true",
-						"true undefined"
-					},
-					CorrectAnswerIndex = 0
-				},
-				AnswerIndex = 3
-			};
-			CompareAnswers(expected, test.Answers.ElementAt(1));
+                expected = new Answer
+                {
+                    Question = new Question
+                    {
+                        QuestionText = "Тормунд и Джон решили покушать бутербродов. Джон маленький и хочет скушать 2 бутерброда, а Тормунд большой и хочет 4. Но у Джона только 1 кусочек хлеба, а у Тормунда - только 3. Сколько кусочков хлеба им не хватает?",
+                        AnswersList = new List<string>
+                    {
+                        "'1-23-4'",
+                        "-2",
+                        "'1-2-1'",
+                        "'-13-4'"
+                    },
+                        CorrectAnswerIndex = 2
+                    },
+                    AnswerIndex = 2
+                };
+                CompareAnswers(expected, test.Answers.ElementAt(3));
 
-			expected = new Answer
-			{
-				Question = new Question
-				{
-					QuestionText = "Путник знает, что и как заказать в таверне.",
-					AnswersList = new List<string>
-					{
-						"[ 'bacon and eggs' ]",
-						"[ 'bacon and eggs', 'coffee' ]",
-						"[ 'coffee', 'bacon and eggs' ]",
-						"SyntaxError: Unexpected token"
-					},
-					CorrectAnswerIndex = 0
-				},
-				AnswerIndex = 0
-			};
-			CompareAnswers(expected, test.Answers.ElementAt(2));
+                expected = new Answer
+                {
+                    Question = new Question
+                    {
+                        QuestionText = "Мелисандра хорошо управляется с магией. Получится ли у нас? Что будет выведено в консоль после расфокусировки input элемента?",
+                        AnswersList = new List<string>
+                    {
+                        "focus pocus",
+                        "focus",
+                        "ничего",
+                        "undefined"
+                    },
+                        CorrectAnswerIndex = 2
+                    },
+                    AnswerIndex = 0
+                };
+                CompareAnswers(expected, test.Answers.ElementAt(4));
 
-			expected = new Answer
-			{
-				Question = new Question
-				{
-					QuestionText = "Тормунд и Джон решили покушать бутербродов. Джон маленький и хочет скушать 2 бутерброда, а Тормунд большой и хочет 4. Но у Джона только 1 кусочек хлеба, а у Тормунда - только 3. Сколько кусочков хлеба им не хватает?",
-					AnswersList = new List<string>
-					{
-						"'1-23-4'",
-						"-2",
-						"'1-2-1'",
-						"'-13-4'"
-					},
-					CorrectAnswerIndex = 2
-				},
-				AnswerIndex = 2
-			};
-			CompareAnswers(expected, test.Answers.ElementAt(3));
-
-			expected = new Answer
-			{
-				Question = new Question
-				{
-					QuestionText = "Мелисандра хорошо управляется с магией. Получится ли у нас? Что будет выведено в консоль после расфокусировки input элемента?",
-					AnswersList = new List<string>
-					{
-						"focus pocus",
-						"focus",
-						"ничего",
-						"undefined"
-					},
-					CorrectAnswerIndex = 2
-				},
-				AnswerIndex = 0
-			};
-			CompareAnswers(expected, test.Answers.ElementAt(4));
-		}
-	}
+            }
+        }
+    }
 }
