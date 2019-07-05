@@ -13,7 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\QuizResults\QuizResults.csproj" />
+    <ProjectReference Include="..\src\QuizResults.csproj" />
   </ItemGroup>
 
 </Project>
