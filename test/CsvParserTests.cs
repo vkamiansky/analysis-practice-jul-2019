@@ -62,16 +62,18 @@ namespace QuizResults.Tests
             Assert.Equal(expected.Question.CorrectAnswerIndex, actual.Question.CorrectAnswerIndex);
         }
 
-        [Fact]
-        public void OneCorrectTest()
+        [Theory]
+        [InlineData(866)]
+        [InlineData(1251)]
+        public void OneCorrectTest(int codePage)
         {
             var parser = new CsvParser();
             var bytes = new byte[] { };
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-			
+
             using (var stream = new MemoryStream())
             {
-                using (var writer = new StreamWriter(stream, Encoding.GetEncoding(866)))
+                using (var writer = new StreamWriter(stream, Encoding.GetEncoding(codePage)))
                 {
                     writer.Write(testResultsDataString);
                 }
