@@ -31,7 +31,7 @@ namespace QuizResults.Tests
 			var test = data.First();
 
 			Assert.Equal("email@site.com", test.Person.Email);
-			Assert.Equal("Иван", test.Person.Name);
+			Assert.Equal("РРІР°РЅ", test.Person.Name);
 			Assert.Null(test.Notes);
 			Assert.Equal((uint)60, test.Result);
 
@@ -41,7 +41,7 @@ namespace QuizResults.Tests
 			{
 				Question = new Question
 				{
-					QuestionText = "Мейстеры Цитадели изобрели бургеры и спешат поделиться своим открытием со всеми. Но так ли хорош рецепт?",
+					QuestionText = "РњРµР№СЃС‚РµСЂС‹ Р¦РёС‚Р°РґРµР»Рё РёР·РѕР±СЂРµР»Рё Р±СѓСЂРіРµСЂС‹ Рё СЃРїРµС€Р°С‚ РїРѕРґРµР»РёС‚СЊСЃСЏ СЃРІРѕРёРј РѕС‚РєСЂС‹С‚РёРµРј СЃРѕ РІСЃРµРјРё. РќРѕ С‚Р°Рє Р»Рё С…РѕСЂРѕС€ СЂРµС†РµРїС‚?",
 					AnswersList = new List<string>
 					{
 						"bread bread burger cheese",
@@ -59,7 +59,7 @@ namespace QuizResults.Tests
 			{
 				Question = new Question
 				{
-					QuestionText = "Багет - это хлеб, а хлеб ? это багет?",
+					QuestionText = "Р‘Р°РіРµС‚ - СЌС‚Рѕ С…Р»РµР±, Р° С…Р»РµР± ? СЌС‚Рѕ Р±Р°РіРµС‚?",
 					AnswersList = new List<string>
 					{
 						"undefined true",
@@ -77,7 +77,7 @@ namespace QuizResults.Tests
 			{
 				Question = new Question
 				{
-					QuestionText = "Путник знает, что и как заказать в таверне.",
+					QuestionText = "РџСѓС‚РЅРёРє Р·РЅР°РµС‚, С‡С‚Рѕ Рё РєР°Рє Р·Р°РєР°Р·Р°С‚СЊ РІ С‚Р°РІРµСЂРЅРµ.",
 					AnswersList = new List<string>
 					{
 						"[ 'bacon and eggs' ]",
@@ -95,7 +95,7 @@ namespace QuizResults.Tests
 			{
 				Question = new Question
 				{
-					QuestionText = "Тормунд и Джон решили покушать бутербродов. Джон маленький и хочет скушать 2 бутерброда, а Тормунд большой и хочет 4. Но у Джона только 1 кусочек хлеба, а у Тормунда - только 3. Сколько кусочков хлеба им не хватает?",
+					QuestionText = "РўРѕСЂРјСѓРЅРґ Рё Р”Р¶РѕРЅ СЂРµС€РёР»Рё РїРѕРєСѓС€Р°С‚СЊ Р±СѓС‚РµСЂР±СЂРѕРґРѕРІ. Р”Р¶РѕРЅ РјР°Р»РµРЅСЊРєРёР№ Рё С…РѕС‡РµС‚ СЃРєСѓС€Р°С‚СЊ 2 Р±СѓС‚РµСЂР±СЂРѕРґР°, Р° РўРѕСЂРјСѓРЅРґ Р±РѕР»СЊС€РѕР№ Рё С…РѕС‡РµС‚ 4. РќРѕ Сѓ Р”Р¶РѕРЅР° С‚РѕР»СЊРєРѕ 1 РєСѓСЃРѕС‡РµРє С…Р»РµР±Р°, Р° Сѓ РўРѕСЂРјСѓРЅРґР° - С‚РѕР»СЊРєРѕ 3. РЎРєРѕР»СЊРєРѕ РєСѓСЃРѕС‡РєРѕРІ С…Р»РµР±Р° РёРј РЅРµ С…РІР°С‚Р°РµС‚?",
 					AnswersList = new List<string>
 					{
 						"'1-23-4'",
@@ -113,12 +113,12 @@ namespace QuizResults.Tests
 			{
 				Question = new Question
 				{
-					QuestionText = "Мелисандра хорошо управляется с магией. Получится ли у нас? Что будет выведено в консоль после расфокусировки input элемента?",
+					QuestionText = "РњРµР»РёСЃР°РЅРґСЂР° С…РѕСЂРѕС€Рѕ СѓРїСЂР°РІР»СЏРµС‚СЃСЏ СЃ РјР°РіРёРµР№. РџРѕР»СѓС‡РёС‚СЃСЏ Р»Рё Сѓ РЅР°СЃ? Р§С‚Рѕ Р±СѓРґРµС‚ РІС‹РІРµРґРµРЅРѕ РІ РєРѕРЅСЃРѕР»СЊ РїРѕСЃР»Рµ СЂР°СЃС„РѕРєСѓСЃРёСЂРѕРІРєРё input СЌР»РµРјРµРЅС‚Р°?",
 					AnswersList = new List<string>
 					{
 						"focus pocus",
 						"focus",
-						"ничего",
+						"РЅРёС‡РµРіРѕ",
 						"undefined"
 					},
 					CorrectAnswerIndex = 2
