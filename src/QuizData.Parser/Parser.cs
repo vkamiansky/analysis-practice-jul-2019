@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using QuizResults.Models;
+using QuizData.Parser.Models;
 
-namespace QuizResults
+namespace QuizData.Parser
 {
 	public class CsvParser
 	{

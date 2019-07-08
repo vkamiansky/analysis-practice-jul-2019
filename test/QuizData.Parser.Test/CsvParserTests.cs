@@ -1,13 +1,12 @@
 using System;
 using Xunit;
-using QuizResults;
-using QuizResults.Models;
+using QuizData.Parser.Models;
 using System.Linq;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace QuizResults.Tests
+namespace QuizData.Parser.Tests
 {
     public class CsvParserTests
     {

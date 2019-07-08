@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace QuizResults
+namespace QuizData.Analyser.Models
 {
 	public class QuestionStatistics
 	{

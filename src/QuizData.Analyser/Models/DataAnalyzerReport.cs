@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace QuizResults
+namespace QuizData.Analyser.Models
 {
-	public class DataAnalyzerReport
+	public class DataAnalyserReport
 	{
 		public uint TotalAmountOfTests { get; set; }
 		public uint AmountOfUniqueEmails { get; set; }

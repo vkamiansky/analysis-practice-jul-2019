@@ -1,8 +1,10 @@
 ﻿using Microsoft.Extensions.Configuration;
+using QuizData.Analyser;
+using QuizData.Parser;
 using System;
 using System.IO;
 
-namespace QuizResults
+namespace QuizData
 {
 	class Program
 	{
@@ -26,7 +28,7 @@ namespace QuizResults
 				Console.WriteLine(parser.ErrorMessage);
 			}
 
-			var report = DataAnalyzer.Analyze(data);
+			var report = DataAnalyser.Analyze(data);
 
 			Console.WriteLine("Всего тестов: {0}", report.TotalAmountOfTests);
 			Console.WriteLine("Количество уникальных e-mail'ов: {0}", report.AmountOfUniqueEmails);
