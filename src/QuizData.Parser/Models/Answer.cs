@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace QuizResults.Models
+namespace QuizData.Parser.Models
 {
 	public class Answer
 	{

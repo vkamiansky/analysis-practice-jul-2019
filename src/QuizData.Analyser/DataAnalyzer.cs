@@ -1,14 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using QuizData.Analyser.Models;
+using QuizData.Parser.Models;
 
-namespace QuizResults
+namespace QuizData.Analyser
 {
-	public class DataAnalyzer
+	public class DataAnalyser
 	{
-		public static DataAnalyzerReport Analyze(IEnumerable<Models.PersonTestResult> data)
+		public static DataAnalyserReport Analyze(IEnumerable<PersonTestResult> data)
 		{
-			var report = new DataAnalyzerReport();
+			var report = new DataAnalyserReport();
 
 			// Collection of pair <Email, Number of attempts>
 			var attemptsNumber = new Dictionary<string, int>();

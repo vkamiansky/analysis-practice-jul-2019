@@ -30,6 +30,9 @@ bld/
 # Visual Studio Code preferences and tasks
 .vscode/
 
+# Ionide C# settings directory
+.ionide/
+
 # MSTest test Results
 [Tt]est[Rr]esult*/
 [Bb]uild[Ll]og.*
