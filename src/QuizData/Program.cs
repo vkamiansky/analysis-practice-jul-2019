@@ -3,6 +3,7 @@ using QuizData.Analyser;
 using QuizData.Parser;
 using System;
 using System.IO;
+using System.Text;
 
 namespace QuizData
 {
@@ -21,7 +22,9 @@ namespace QuizData
 		{
 			var parser = new CsvParser();
 			var config = BuildConfiguration();
-			var data = parser.ParseFile(config["DataFilePath"]);
+			Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+			var encoding = EncodingDetector.GetEncoding(config["DataFilePath"]);
+			var data = parser.ParseFile(config["DataFilePath"], encoding);
 			if (parser.ErrorMessage != null)
 			{
 				Console.WriteLine("Parsing failed");
