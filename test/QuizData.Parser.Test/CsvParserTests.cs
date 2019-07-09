@@ -82,8 +82,9 @@ namespace QuizData.Parser.Tests
             using (var stream = new MemoryStream(bytes))
             {
                 var data = parser.ParseStream(stream);
-                Assert.Single(data);
-                var test = data.First();
+                var testResults = data.Take(2).ToArray();
+                Assert.Single(testResults);
+                var test = testResults[0];
 
                 Assert.Equal("email@site.com", test.Person.Email);
                 Assert.Equal("Иван", test.Person.Name);

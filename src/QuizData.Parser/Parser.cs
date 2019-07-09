@@ -183,7 +183,6 @@ namespace QuizData.Parser
 
 		public IEnumerable<PersonTestResult> ParseStream(Stream stream)
 		{
-			var result = new List<PersonTestResult>();
 			Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 			using (_reader = new StreamReader(stream, Encoding.GetEncoding(866)))
 			{
@@ -195,10 +194,9 @@ namespace QuizData.Parser
 					var test = ReadTest();
 					if (test == null)
 						continue;
-					result.Add(test);
+					yield return test;
 				}
 			}
-			return result;
 		}
 	}
 }
