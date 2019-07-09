@@ -21,7 +21,8 @@ namespace QuizData
 		{
 			var parser = new CsvParser();
 			var config = BuildConfiguration();
-			var data = parser.ParseFile(config["DataFilePath"]);
+			var encoding = EncodingDetector.GetEncoding(config["DataFilePath"]);
+			var data = parser.ParseFile(config["DataFilePath"], encoding);
 			if (parser.ErrorMessage != null)
 			{
 				Console.WriteLine("Parsing failed");
