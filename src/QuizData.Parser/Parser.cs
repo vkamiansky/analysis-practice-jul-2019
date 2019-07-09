@@ -176,16 +176,15 @@ namespace QuizData.Parser
 			};
 		}
 
-		public IEnumerable<PersonTestResult> ParseFile(string path, Encoding encoding)
+		public IEnumerable<PersonTestResult> ParseFile(string path)
 		{
-			return ParseStream(new FileStream(path, FileMode.Open), encoding);
+			return ParseStream(new FileStream(path, FileMode.Open));
 		}
 
-		public IEnumerable<PersonTestResult> ParseStream(Stream stream, Encoding encoding)
+		public IEnumerable<PersonTestResult> ParseStream(Stream stream)
 		{
-
 			Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-			using (_reader = new StreamReader(stream, encoding))
+			using (_reader = new StreamReader(stream, Encoding.GetEncoding(866)))
 			{
 				CurrentLineNumber = -1;
 				ErrorMessage = null;
