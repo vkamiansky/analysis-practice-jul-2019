@@ -69,7 +69,7 @@ namespace QuizData.Parser.Test
 		[InlineData(866)]
 		[InlineData(1251)]
 		[InlineData(65001)]
-		public void TestOEM866(int codepage)
+		public void TestDetectingCodepages(int codepage)
 		{
 			Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 			var stream = CreateStreamFromText(testResultsDataString, Encoding.GetEncoding(codepage));
