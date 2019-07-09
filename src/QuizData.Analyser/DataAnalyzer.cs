@@ -68,6 +68,9 @@ namespace QuizData.Analyser
 						qStatistics[answer.Question.QuestionText].RightAnswersAmount++;
 					else
 						qStatistics[answer.Question.QuestionText].WrongAnswersAmount++;
+
+					qStatistics[answer.Question.QuestionText].AnswersDistribution[answer.AnswerIndex]++;
+					qStatistics[answer.Question.QuestionText].RightAnswerIndex = answer.Question.CorrectAnswerIndex;
 				}
 			}
 
