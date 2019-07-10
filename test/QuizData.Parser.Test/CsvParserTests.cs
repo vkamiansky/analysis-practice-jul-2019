@@ -64,6 +64,7 @@ namespace QuizData.Parser.Tests
         [Theory]
         [InlineData(866)]
         [InlineData(1251)]
+		[InlineData(65001)]
         public void OneCorrectTest(int codePage)
         {
             var parser = new CsvParser();
@@ -81,7 +82,7 @@ namespace QuizData.Parser.Tests
 
             using (var stream = new MemoryStream(bytes))
             {
-                var data = parser.ParseStream(stream);
+                var data = parser.ParseStream(stream, Encoding.GetEncoding(codePage));
                 var testResults = data.Take(2).ToArray();
                 Assert.Single(testResults);
                 var test = testResults[0];
