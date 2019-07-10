@@ -18,6 +18,9 @@ namespace QuizData.Analyser
 			// Collection of pair <Result, Amount>
 			var resultDistribution = new Dictionary<uint, uint>();
 
+			// Statistics on questions
+			var qStatistics = new Dictionary<string, QuestionStatistics>();
+
 			var totalAmount = 0U;
 			var maxNumberOfAttempts = 0;
 			var personWithMaxNumberOfAttempts = "";
@@ -39,26 +42,8 @@ namespace QuizData.Analyser
 				resultDistribution[testResult.Result]++;
 
 				totalAmount++;
-			}
 
-			report.TotalAmountOfTests = totalAmount;
-			report.AmountOfUniqueEmails = (uint)attemptsNumber.Count;
-
-			var attemptDistribution = new uint[maxNumberOfAttempts];
-			foreach (var el in attemptsNumber)
-			{
-				attemptDistribution[el.Value - 1]++;
-			}
-
-			report.AttemptDistribution = attemptDistribution;
-
-			report.ResultDistribution = resultDistribution;
-
-			// Statistics on questions
-			var qStatistics = new Dictionary<string, QuestionStatistics>();
-
-			foreach (var testResult in data)
-			{
+				// Collect statistics on questions
 				foreach (var answer in testResult.Answers)
 				{
 					if (!qStatistics.ContainsKey(answer.Question.QuestionText))
@@ -72,8 +57,20 @@ namespace QuizData.Analyser
 					qStatistics[answer.Question.QuestionText].AnswersDistribution[answer.AnswerIndex]++;
 					qStatistics[answer.Question.QuestionText].RightAnswerIndex = answer.Question.CorrectAnswerIndex;
 				}
+
 			}
 
+			report.TotalAmountOfTests = totalAmount;
+			report.AmountOfUniqueEmails = (uint)attemptsNumber.Count;
+
+			var attemptDistribution = new uint[maxNumberOfAttempts];
+			foreach (var el in attemptsNumber)
+			{
+				attemptDistribution[el.Value - 1]++;
+			}
+
+			report.AttemptDistribution = attemptDistribution;
+			report.ResultDistribution = resultDistribution;
 			report.QuestionStatistics = qStatistics;
 
 			return report;

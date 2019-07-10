@@ -49,8 +49,8 @@ namespace QuizData
 			Console.WriteLine("Статистика вопросов:");
 			foreach (var el in report.QuestionStatistics)
 			{
-				Console.WriteLine("Вопрос: {0}\n\n\nПравильных ответов: {1}, неправильных: {2}, всего: {3}\n\n\n" +
-					"Правильный ответ: {4}, а люди отвечали {5} {6} {7} {8} раз\n",
+				Console.WriteLine("Вопрос: {0}\nПравильных ответов: {1}, неправильных: {2}, всего: {3}\n" +
+					"Правильный ответ: {4}, а люди отвечали 0:{5} 1:{6} 2:{7} 3:{8}\n\n",
 					el.Key, el.Value.RightAnswersAmount, el.Value.WrongAnswersAmount,
 					el.Value.RightAnswersAmount + el.Value.WrongAnswersAmount,
 					el.Value.RightAnswerIndex, el.Value.AnswersDistribution[0], el.Value.AnswersDistribution[1],
