@@ -1,5 +1,4 @@
-﻿using System.IO;
-using System.Text;
+﻿using System.Text;
 using Xunit;
 
 namespace QuizData.Parser.Test
@@ -13,7 +12,8 @@ namespace QuizData.Parser.Test
 		public void TestDetectingCodepages(int codepage)
 		{
 			Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-			var stream = Common.CreateStreamFromText(Common.TestResultsDataString,
+			var stream = Common.CreateStreamFromText(
+				Common.TestResultsDataString,
 				Encoding.GetEncoding(codepage));
 			var encoding = EncodingDetector.GetEncoding(stream);
 			Assert.Equal(codepage, encoding.CodePage);
