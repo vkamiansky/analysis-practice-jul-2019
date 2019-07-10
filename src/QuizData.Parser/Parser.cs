@@ -6,7 +6,7 @@ using QuizData.Parser.Models;
 
 namespace QuizData.Parser
 {
-	public class CsvParser
+	public class CsvParser : IParser
 	{
 		/// <summary>
 		/// Null when everything is OK

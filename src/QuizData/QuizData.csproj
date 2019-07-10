@@ -10,7 +10,7 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.2.0" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\QuizData.Parser\QuizData.Parser.csproj" />
     <ProjectReference Include="..\QuizData.Analyser\QuizData.Analyser.csproj" />
+    <ProjectReference Include="..\QuizData.Parser\QuizData.Parser.csproj" />
   </ItemGroup>
 </Project>
