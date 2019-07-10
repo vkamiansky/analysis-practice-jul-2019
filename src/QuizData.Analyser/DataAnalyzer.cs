@@ -18,6 +18,9 @@ namespace QuizData.Analyser
 			// Collection of pair <Result, Amount>
 			var resultDistribution = new Dictionary<uint, uint>();
 
+			// Statistics on questions
+			var qStatistics = new Dictionary<string, QuestionStatistics>();
+
 			var totalAmount = 0U;
 			var maxNumberOfAttempts = 0;
 			var personWithMaxNumberOfAttempts = "";
@@ -39,6 +42,22 @@ namespace QuizData.Analyser
 				resultDistribution[testResult.Result]++;
 
 				totalAmount++;
+
+				// Collect statistics on questions
+				foreach (var answer in testResult.Answers)
+				{
+					if (!qStatistics.ContainsKey(answer.Question.QuestionText))
+						qStatistics.Add(answer.Question.QuestionText, new QuestionStatistics());
+
+					if (answer.AnswerIndex == answer.Question.CorrectAnswerIndex)
+						qStatistics[answer.Question.QuestionText].RightAnswersAmount++;
+					else
+						qStatistics[answer.Question.QuestionText].WrongAnswersAmount++;
+
+					qStatistics[answer.Question.QuestionText].AnswersDistribution[answer.AnswerIndex]++;
+					qStatistics[answer.Question.QuestionText].RightAnswerIndex = answer.Question.CorrectAnswerIndex;
+				}
+
 			}
 
 			report.TotalAmountOfTests = totalAmount;
@@ -51,26 +70,7 @@ namespace QuizData.Analyser
 			}
 
 			report.AttemptDistribution = attemptDistribution;
-
 			report.ResultDistribution = resultDistribution;
-
-			// Statistics on questions
-			var qStatistics = new Dictionary<string, QuestionStatistics>();
-
-			foreach (var testResult in data)
-			{
-				foreach (var answer in testResult.Answers)
-				{
-					if (!qStatistics.ContainsKey(answer.Question.QuestionText))
-						qStatistics.Add(answer.Question.QuestionText, new QuestionStatistics());
-
-					if (answer.AnswerIndex == answer.Question.CorrectAnswerIndex)
-						qStatistics[answer.Question.QuestionText].RightAnswersAmount++;
-					else
-						qStatistics[answer.Question.QuestionText].WrongAnswersAmount++;
-				}
-			}
-
 			report.QuestionStatistics = qStatistics;
 
 			return report;
