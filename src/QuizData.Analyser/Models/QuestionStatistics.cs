@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace QuizData.Analyser.Models
+﻿namespace QuizData.Analyser.Models
 {
 	public class QuestionStatistics
 	{
