@@ -6,14 +6,14 @@ using QuizData.Parser.Models;
 
 namespace QuizData.Analyser
 {
-	public class DataAnalyser
+	public static class DataAnalyser
 	{
 		public static DataAnalyserReport Analyze(IEnumerable<PersonTestResult> data)
 		{
 			var report = new DataAnalyserReport();
 
-			// Collection of pair <Email, Number of attempts>
-			var attemptsNumber = new Dictionary<string, int>();
+			// Collection of pair <Email, Amount of attempts>
+			var amountOfAttempts = new Dictionary<string, uint>();
 
 			// Collection of pair <Result, Amount>
 			var resultDistribution = new Dictionary<uint, uint>();
@@ -22,18 +22,18 @@ namespace QuizData.Analyser
 			var qStatistics = new Dictionary<string, QuestionStatistics>();
 
 			var totalAmount = 0U;
-			var maxNumberOfAttempts = 0;
+			var maxNumberOfAttempts = 0U;
 			var personWithMaxNumberOfAttempts = "";
 
 			foreach (var testResult in data)
 			{
-				if (!attemptsNumber.ContainsKey(testResult.Person.Email))
-					attemptsNumber.Add(testResult.Person.Email, 0);
-				attemptsNumber[testResult.Person.Email]++;
+				if (!amountOfAttempts.ContainsKey(testResult.Person.Email))
+					amountOfAttempts.Add(testResult.Person.Email, 0);
+				amountOfAttempts[testResult.Person.Email]++;
 
-				if (attemptsNumber[testResult.Person.Email] > maxNumberOfAttempts)
+				if (amountOfAttempts[testResult.Person.Email] > maxNumberOfAttempts)
 				{
-					maxNumberOfAttempts = attemptsNumber[testResult.Person.Email];
+					maxNumberOfAttempts = amountOfAttempts[testResult.Person.Email];
 					personWithMaxNumberOfAttempts = testResult.Person.Email;
 				}
 
@@ -61,19 +61,56 @@ namespace QuizData.Analyser
 			}
 
 			report.TotalAmountOfTests = totalAmount;
-			report.AmountOfUniqueEmails = (uint)attemptsNumber.Count;
-
-			var attemptDistribution = new uint[maxNumberOfAttempts];
-			foreach (var el in attemptsNumber)
-			{
-				attemptDistribution[el.Value - 1]++;
-			}
-
-			report.AttemptDistribution = attemptDistribution;
+			report.AmountOfAttempts = amountOfAttempts;
 			report.ResultDistribution = resultDistribution;
 			report.QuestionStatistics = qStatistics;
 
 			return report;
+		}
+
+		/// <summary>
+		/// Analyzes new information and adds data to an existing report
+		/// </summary>
+		/// <param name="report">An existing report</param>
+		/// <param name="newData">Collection of new tests</param>
+		public static void AddNewData(this DataAnalyserReport report, IEnumerable<PersonTestResult> newData)
+		{
+			foreach (var el in newData)
+				AddNewData(report, el);
+		}
+
+		/// <summary>
+		/// Analyzes new information and adds data to an existing report
+		/// </summary>
+		/// <param name="report">An existing report</param>
+		/// <param name="newData">Information about new test</param>
+		public static void AddNewData(this DataAnalyserReport report, PersonTestResult newData)
+		{
+			if (!report.AmountOfAttempts.ContainsKey(newData.Person.Email))
+				report.AmountOfAttempts.Add(newData.Person.Email, 0U);
+			report.AmountOfAttempts[newData.Person.Email]++;
+
+			if (!report.ResultDistribution.ContainsKey(newData.Result))
+				report.ResultDistribution.Add(newData.Result, 0U);
+			report.ResultDistribution[newData.Result]++;
+
+			report.TotalAmountOfTests++;
+
+			foreach (var answer in newData.Answers)
+			{
+				if (!report.QuestionStatistics.ContainsKey(answer.Question.QuestionText))
+					report.QuestionStatistics.Add(answer.Question.QuestionText, new QuestionStatistics());
+				var el = report.QuestionStatistics[answer.Question.QuestionText];
+
+				if (answer.AnswerIndex == answer.Question.CorrectAnswerIndex)
+					el.RightAnswersAmount++;
+				else
+					el.WrongAnswersAmount++;
+
+				el.RightAnswerIndex = answer.Question.CorrectAnswerIndex;
+
+				el.AnswersDistribution[answer.AnswerIndex]++;
+			}
 		}
 	}
 }
