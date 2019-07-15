@@ -19,6 +19,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QuizData.Analyser.Test", "t
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuizData.TextReport", "src\QuizData.TextReport\QuizData.TextReport.csproj", "{7703F03A-21FE-43F9-8D73-7DAFF0253EF0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuizData.Report.Test", "test\QuizData.Report.Test\QuizData.Report.Test.csproj", "{5B92F848-48F2-4D8D-BAA8-19149F6AD36D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -49,6 +51,10 @@ Global
 		{7703F03A-21FE-43F9-8D73-7DAFF0253EF0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7703F03A-21FE-43F9-8D73-7DAFF0253EF0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7703F03A-21FE-43F9-8D73-7DAFF0253EF0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5B92F848-48F2-4D8D-BAA8-19149F6AD36D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5B92F848-48F2-4D8D-BAA8-19149F6AD36D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5B92F848-48F2-4D8D-BAA8-19149F6AD36D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5B92F848-48F2-4D8D-BAA8-19149F6AD36D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -60,6 +66,7 @@ Global
 		{9DF82656-DFFF-480D-AC3E-0EB467E3D589} = {1AF68225-F3CB-4AB6-9B7F-61F8A5201B62}
 		{7E1DFAFA-1A76-4CF2-A429-B80624385336} = {1AF68225-F3CB-4AB6-9B7F-61F8A5201B62}
 		{7703F03A-21FE-43F9-8D73-7DAFF0253EF0} = {C3AB0661-D6C3-490D-AF73-C5D4880AFF37}
+		{5B92F848-48F2-4D8D-BAA8-19149F6AD36D} = {1AF68225-F3CB-4AB6-9B7F-61F8A5201B62}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7A498A42-2551-4BA1-83B3-CAB7237C881A}
