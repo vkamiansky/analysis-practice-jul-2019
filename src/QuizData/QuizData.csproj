@@ -11,6 +11,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\QuizData.Analyser\QuizData.Analyser.csproj" />
+    <ProjectReference Include="..\QuizData.ExcelReporter\QuizData.ExcelReport.csproj" />
     <ProjectReference Include="..\QuizData.Parser\QuizData.Parser.csproj" />
   </ItemGroup>
 </Project>

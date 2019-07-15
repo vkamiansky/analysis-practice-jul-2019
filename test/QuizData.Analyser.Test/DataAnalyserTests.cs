@@ -105,10 +105,18 @@ namespace QuizData.Analyser.Test
 		private DataAnalyserReport _dataAnalyserReport { get; } = new DataAnalyserReport
 		{
 			TotalAmountOfTests = 1U,
-			AmountOfAttempts = new Dictionary<string, uint>()
-				{
-					{ "email@site.com", 1 }
-				},
+			PersonStatistics = new Dictionary<string, PersonStatistics>()
+			{
+				{ "email@site.com", new PersonStatistics()
+					{
+						AmountOfAttempts = 1,
+						Results = new List<uint>()
+						{
+							60U
+						}
+					}
+				}
+			},
 			ResultDistribution = new Dictionary<uint, uint>()
 				{
 					{ 60U, 1U }
@@ -171,10 +179,24 @@ namespace QuizData.Analyser.Test
             Assert.Equal(expected.WrongAnswersAmount, actual.WrongAnswersAmount);
         }
 
+		internal void ComparePersonStatistics(PersonStatistics expected, PersonStatistics actual)
+		{
+			Assert.Equal(expected.AmountOfAttempts, actual.AmountOfAttempts);
+			Assert.Equal(expected.Results, actual.Results);
+		}
+
 		internal void CompareDataAnalyserReports(DataAnalyserReport expected, DataAnalyserReport actual)
 		{
 			Assert.Equal(expected.TotalAmountOfTests, actual.TotalAmountOfTests);
-			Assert.Equal(expected.AmountOfAttempts, actual.AmountOfAttempts);
+
+			Assert.Equal(expected.PersonStatistics.Count, actual.PersonStatistics.Count);
+			foreach (var key in expected.PersonStatistics.Keys)
+			{
+				Assert.True(actual.PersonStatistics.ContainsKey(key));
+				ComparePersonStatistics(expected.PersonStatistics[key],
+					actual.PersonStatistics[key]);
+			}
+
 			Assert.Equal(expected.ResultDistribution, actual.ResultDistribution);
 
 			Assert.Equal(expected.QuestionStatistics.Count, actual.QuestionStatistics.Count);

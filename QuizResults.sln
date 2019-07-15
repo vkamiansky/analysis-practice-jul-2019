@@ -17,6 +17,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QuizData.Parser.Test", "tes
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QuizData.Analyser.Test", "test\QuizData.Analyser.Test\QuizData.Analyser.Test.csproj", "{7E1DFAFA-1A76-4CF2-A429-B80624385336}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuizData.ExcelReport", "src\QuizData.ExcelReporter\QuizData.ExcelReport.csproj", "{275FB19F-4765-4CC2-B982-A976A502213C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -43,6 +45,10 @@ Global
 		{7E1DFAFA-1A76-4CF2-A429-B80624385336}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7E1DFAFA-1A76-4CF2-A429-B80624385336}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7E1DFAFA-1A76-4CF2-A429-B80624385336}.Release|Any CPU.Build.0 = Release|Any CPU
+		{275FB19F-4765-4CC2-B982-A976A502213C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{275FB19F-4765-4CC2-B982-A976A502213C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{275FB19F-4765-4CC2-B982-A976A502213C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{275FB19F-4765-4CC2-B982-A976A502213C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -53,6 +59,7 @@ Global
 		{7F37877A-7396-459D-B41D-498EA5B75C68} = {C3AB0661-D6C3-490D-AF73-C5D4880AFF37}
 		{9DF82656-DFFF-480D-AC3E-0EB467E3D589} = {1AF68225-F3CB-4AB6-9B7F-61F8A5201B62}
 		{7E1DFAFA-1A76-4CF2-A429-B80624385336} = {1AF68225-F3CB-4AB6-9B7F-61F8A5201B62}
+		{275FB19F-4765-4CC2-B982-A976A502213C} = {C3AB0661-D6C3-490D-AF73-C5D4880AFF37}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7A498A42-2551-4BA1-83B3-CAB7237C881A}

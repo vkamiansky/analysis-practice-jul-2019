@@ -6,15 +6,15 @@ namespace QuizData.Analyser.Models
 	public class DataAnalyserReport
 	{
 		public uint TotalAmountOfTests { get; set; }
-		public Dictionary<string, uint> AmountOfAttempts { get; set; }
 		public Dictionary<uint, uint> ResultDistribution { get; set; }
+		public Dictionary<string, PersonStatistics> PersonStatistics { get; set; }
 		public Dictionary<string, QuestionStatistics> QuestionStatistics { get; set; }
 
 		public uint AmountOfUniqueEmails
 		{
 			get
 			{
-				return (uint)AmountOfAttempts.Count;
+				return (uint)PersonStatistics.Count;
 			}
 		}
 
@@ -23,14 +23,14 @@ namespace QuizData.Analyser.Models
 			get
 			{
 				var maxNumberOfAttempts = 0U;
-				foreach (var el in AmountOfAttempts)
+				foreach (var el in PersonStatistics)
 				{
-					maxNumberOfAttempts = Math.Max(maxNumberOfAttempts, el.Value);
+					maxNumberOfAttempts = Math.Max(maxNumberOfAttempts, el.Value.AmountOfAttempts);
 				}
 				var result = new uint[maxNumberOfAttempts];
-				foreach (var el in AmountOfAttempts)
+				foreach (var el in PersonStatistics)
 				{
-					result[el.Value - 1]++;
+					result[el.Value.AmountOfAttempts - 1]++;
 				}
 				return result;
 			}
