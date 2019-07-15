@@ -33,7 +33,10 @@ namespace QuizData
 			}
 
 			var report = DataAnalyser.Analyze(data);
-			TextReporter.ToFile("report.txt", report);
+			using (var stream = new FileStream("report.txt", FileMode.Create))
+			{
+				TextReporter.ToStream(stream, report);
+			}
 		}
 	}
 }
