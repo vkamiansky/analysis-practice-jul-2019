@@ -106,21 +106,23 @@ namespace QuizData.Report.Test
 		[Fact]
         public void TextReporterTest()
         {
-			var stream = new MemoryStream();
-			TextReporter.ToStream(stream, _dataAnalyserReport);
+            using (var stream = new MemoryStream())
+            {
+                TextReporter.ToStream(stream, _dataAnalyserReport);
 
-			using (var readableStream = new MemoryStream(stream.ToArray()))
-			{
-				using (var reader = new StreamReader(readableStream))
-				{
-					var text = _textReporterOutput.Split(Environment.NewLine);
-					var i = 0;
-					while (!reader.EndOfStream)
-					{
-						Assert.Equal(text[i++], reader.ReadLine());
-					}
-				}
-			}
+                using (var readableStream = new MemoryStream(stream.ToArray()))
+                {
+                    using (var reader = new StreamReader(readableStream))
+                    {
+                        var text = _textReporterOutput.Split(Environment.NewLine);
+                        var i = 0;
+                        while (!reader.EndOfStream)
+                        {
+                            Assert.Equal(text[i++], reader.ReadLine());
+                        }
+                    }
+                }
+            }
         }
     }
 }
