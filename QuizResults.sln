@@ -17,6 +17,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QuizData.Parser.Test", "tes
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QuizData.Analyser.Test", "test\QuizData.Analyser.Test\QuizData.Analyser.Test.csproj", "{7E1DFAFA-1A76-4CF2-A429-B80624385336}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuizData.LinearApproximation", "src\QuizData.LinearApproximation\QuizData.LinearApproximation.csproj", "{F31C26CD-6364-4B63-90B0-E543644F5FE3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuizData.LinearApproximation.Test", "test\QuizData.LinearApproximation.Test\QuizData.LinearApproximation.Test.csproj", "{B19688E3-1CAD-4AAE-8752-1FA932AFA280}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -43,6 +47,14 @@ Global
 		{7E1DFAFA-1A76-4CF2-A429-B80624385336}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7E1DFAFA-1A76-4CF2-A429-B80624385336}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7E1DFAFA-1A76-4CF2-A429-B80624385336}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F31C26CD-6364-4B63-90B0-E543644F5FE3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F31C26CD-6364-4B63-90B0-E543644F5FE3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F31C26CD-6364-4B63-90B0-E543644F5FE3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F31C26CD-6364-4B63-90B0-E543644F5FE3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B19688E3-1CAD-4AAE-8752-1FA932AFA280}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B19688E3-1CAD-4AAE-8752-1FA932AFA280}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B19688E3-1CAD-4AAE-8752-1FA932AFA280}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B19688E3-1CAD-4AAE-8752-1FA932AFA280}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -53,6 +65,8 @@ Global
 		{7F37877A-7396-459D-B41D-498EA5B75C68} = {C3AB0661-D6C3-490D-AF73-C5D4880AFF37}
 		{9DF82656-DFFF-480D-AC3E-0EB467E3D589} = {1AF68225-F3CB-4AB6-9B7F-61F8A5201B62}
 		{7E1DFAFA-1A76-4CF2-A429-B80624385336} = {1AF68225-F3CB-4AB6-9B7F-61F8A5201B62}
+		{F31C26CD-6364-4B63-90B0-E543644F5FE3} = {C3AB0661-D6C3-490D-AF73-C5D4880AFF37}
+		{B19688E3-1CAD-4AAE-8752-1FA932AFA280} = {1AF68225-F3CB-4AB6-9B7F-61F8A5201B62}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7A498A42-2551-4BA1-83B3-CAB7237C881A}
