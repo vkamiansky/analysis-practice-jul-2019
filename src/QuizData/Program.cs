@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using QuizData.Analyser;
 using QuizData.Parser;
+using QuizData.TextReport;
 using System;
 using System.IO;
 using System.Text;
@@ -32,8 +33,10 @@ namespace QuizData
 			}
 
 			var report = DataAnalyser.Analyze(data);
-			ExcelReporter.ExcelReporter.ToFile("excel.xlsx", report);
-			
-		}
+            using (var stream = new FileStream("report.txt", FileMode.Create))
+            {
+                TextReporter.ToStream(stream, report);
+            }
+        }
 	}
 }
