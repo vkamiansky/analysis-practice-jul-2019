@@ -8,9 +8,11 @@ namespace QuizData.Analyser
 {
 	public static class DataAnalyser
 	{
+        private static uint _minNumberForAdvStat;
+
         public static void CalculateAdditionalInfo(PersonStatistics pStatistics)
         {
-            if (pStatistics.AmountOfAttempts > 1)
+            if (pStatistics.AmountOfAttempts > _minNumberForAdvStat - 1)
             {
                 var x = new double[pStatistics.AmountOfAttempts];
                 for (var i = 0; i < x.Length; i++)
@@ -28,8 +30,16 @@ namespace QuizData.Analyser
             }
         }
 
-		public static DataAnalyserReport Analyze(IEnumerable<PersonTestResult> data)
+        /// <summary>
+        /// Performs data analysis
+        /// </summary>
+        /// <param name="data">Data for analysis</param>
+        /// <param name="minNumberForAdvStat">Minimum number of tests for one person to build advanced statistics</param>
+        /// <returns>Report</returns>
+		public static DataAnalyserReport Analyze(IEnumerable<PersonTestResult> data, uint minNumberForAdvStat = 4)
 		{
+            _minNumberForAdvStat = minNumberForAdvStat;
+
 			var report = new DataAnalyserReport();
 
 			// Collection of pair <Email, Amount of attempts>
