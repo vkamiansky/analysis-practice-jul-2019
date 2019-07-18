@@ -2,9 +2,17 @@
 
 namespace QuizData.Analyser.Models
 {
-	public class PersonStatistics
-	{
-		public uint AmountOfAttempts { get; set; }
-		public List<uint> Results { get; set; } = new List<uint>();
-	}
+    public class PersonStatistics
+    {
+        public List<uint> Results { get; set; } = new List<uint>();
+        public (double K, double B)? AdditionalInfo { get; set; }
+
+        public uint AmountOfAttempts
+        {
+            get
+            {
+                return (uint)Results.Count;
+            }
+        }
+    }
 }

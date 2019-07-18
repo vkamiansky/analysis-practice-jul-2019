@@ -16,7 +16,6 @@ namespace QuizData.Report.Test
             {
                 { "email@site.com", new PersonStatistics()
                     {
-                        AmountOfAttempts = 1,
                         Results = new List<uint>()
                         {
                             60U

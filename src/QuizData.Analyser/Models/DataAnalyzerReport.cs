@@ -35,5 +35,49 @@ namespace QuizData.Analyser.Models
 				return result;
 			}
 		}
+
+        public (NumericDistribution kDistribution, NumericDistribution bDistribution) GetAdditionalInfo()
+        {
+            var minK = double.MaxValue;
+            var maxK = double.MinValue;
+            var minB = double.MaxValue;
+            var maxB = double.MinValue;
+
+            var personsWithAddInfoCount = 0;
+
+            foreach (var el in PersonStatistics)
+            {
+                if (el.Value.AdditionalInfo != null)
+                {
+                    if (el.Value.AdditionalInfo.Value.K < minK)
+                        minK = el.Value.AdditionalInfo.Value.K;
+                    if (el.Value.AdditionalInfo.Value.K > maxK)
+                        maxK = el.Value.AdditionalInfo.Value.K;
+
+                    if (el.Value.AdditionalInfo.Value.B < minB)
+                        minB = el.Value.AdditionalInfo.Value.B;
+                    if (el.Value.AdditionalInfo.Value.B > maxB)
+                        maxB = el.Value.AdditionalInfo.Value.B;
+
+                    personsWithAddInfoCount++;
+                }
+            }
+
+            if (personsWithAddInfoCount == 0)
+                return (null, null);
+
+            var kDistribution = new NumericDistribution(minK, maxK, 10);
+            var bDistribution = new NumericDistribution(minB, maxB, 10);
+            foreach (var el in PersonStatistics)
+            {
+                if (el.Value.AdditionalInfo != null)
+                {
+                    kDistribution.AddNumeric(el.Value.AdditionalInfo.Value.K);
+                    bDistribution.AddNumeric(el.Value.AdditionalInfo.Value.B);
+                }
+            }
+
+            return (kDistribution, bDistribution);
+        }
 	}
 }

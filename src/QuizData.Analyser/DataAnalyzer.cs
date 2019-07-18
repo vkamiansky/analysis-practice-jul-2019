@@ -8,6 +8,26 @@ namespace QuizData.Analyser
 {
 	public static class DataAnalyser
 	{
+        public static void CalculateAdditionalInfo(PersonStatistics pStatistics)
+        {
+            if (pStatistics.AmountOfAttempts > 1)
+            {
+                var x = new double[pStatistics.AmountOfAttempts];
+                for (var i = 0; i < x.Length; i++)
+                {
+                    x[i] = i + 1;
+                }
+
+                pStatistics.AdditionalInfo =
+                    LinearApproximation.LinearApproximation.GetLinearApproximation(x,
+                    pStatistics.Results.ConvertAll(Convert.ToDouble));
+            }
+            else
+            {
+                pStatistics.AdditionalInfo = null;
+            }
+        }
+
 		public static DataAnalyserReport Analyze(IEnumerable<PersonTestResult> data)
 		{
 			var report = new DataAnalyserReport();
@@ -29,7 +49,6 @@ namespace QuizData.Analyser
 			{
 				if (!personStatistics.ContainsKey(testResult.Person.Email))
 					personStatistics.Add(testResult.Person.Email, new PersonStatistics());
-				personStatistics[testResult.Person.Email].AmountOfAttempts++;
 				personStatistics[testResult.Person.Email].Results.Add(testResult.Result);
 
 				if (personStatistics[testResult.Person.Email].AmountOfAttempts > maxNumberOfAttempts)
@@ -58,8 +77,12 @@ namespace QuizData.Analyser
 					qStatistics[answer.Question.QuestionText].AnswersDistribution[answer.AnswerIndex]++;
 					qStatistics[answer.Question.QuestionText].RightAnswerIndex = answer.Question.CorrectAnswerIndex;
 				}
-
 			}
+
+            foreach (var pStatistics in personStatistics)
+            {
+                CalculateAdditionalInfo(pStatistics.Value);
+            }
 
 			report.TotalAmountOfTests = totalAmount;
 			report.PersonStatistics = personStatistics;
@@ -89,8 +112,8 @@ namespace QuizData.Analyser
 		{
 			if (!report.PersonStatistics.ContainsKey(newData.Person.Email))
 				report.PersonStatistics.Add(newData.Person.Email, new PersonStatistics());
-			report.PersonStatistics[newData.Person.Email].AmountOfAttempts++;
 			report.PersonStatistics[newData.Person.Email].Results.Add(newData.Result);
+            CalculateAdditionalInfo(report.PersonStatistics[newData.Person.Email]);
 
 			if (!report.ResultDistribution.ContainsKey(newData.Result))
 				report.ResultDistribution.Add(newData.Result, 0U);

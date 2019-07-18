@@ -3,6 +3,7 @@ using QuizData.Analyser.Models;
 using QuizData.Parser.Models;
 using System.Collections.Generic;
 using System.Linq;
+using System;
 
 namespace QuizData.Analyser.Test
 {
@@ -109,7 +110,6 @@ namespace QuizData.Analyser.Test
 			{
 				{ "email@site.com", new PersonStatistics()
 					{
-						AmountOfAttempts = 1,
 						Results = new List<uint>()
 						{
 							60U
