@@ -16,9 +16,10 @@ namespace QuizData.ExcelReport
         private int _pos2Line;
         private int _pos2Column;
 
+        public bool CanGoBack { get; private set; }
+
         private int _previousStepLine;
         private int _previousStepColumn;
-        private bool _canGoBack;
 
         public ExcelWorksheetWrapper(ExcelWorksheet worksheet)
         {
@@ -31,7 +32,7 @@ namespace QuizData.ExcelReport
         {
             _previousStepLine = _currentLine;
             _previousStepColumn = _currentColumn;
-            _canGoBack = true;
+            CanGoBack = true;
         }
 
         public void Write(object value)
@@ -58,13 +59,13 @@ namespace QuizData.ExcelReport
 
         public void GoBack()
         {
-            if (!_canGoBack)
+            if (!CanGoBack)
                 throw new System.Exception("Something went wrong...");
 
             _currentColumn = _previousStepColumn;
             _currentLine = _previousStepLine;
 
-            _canGoBack = false;
+            CanGoBack = false;
         }
 
         public void SetPos1()
@@ -77,6 +78,11 @@ namespace QuizData.ExcelReport
         {
             _pos2Line = _currentLine;
             _pos2Column = _currentColumn;
+        }
+
+        public void CreateChart(string chartName, string chartTitle)
+        {
+            CreateChart(chartName, chartTitle, this);
         }
 
         public void CreateChart(string chartName, string chartTitle, ExcelWorksheetWrapper to)
