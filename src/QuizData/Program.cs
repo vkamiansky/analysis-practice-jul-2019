@@ -37,6 +37,8 @@ namespace QuizData
             {
                 TextReporter.ToStream(stream, report);
             }
+            var reporter = new ExcelReport.ExcelReporter();
+            reporter.ToFile("out.xlsx", report);
         }
 	}
 }
