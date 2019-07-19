@@ -60,6 +60,39 @@ namespace QuizData.ExcelReport
             _temp.CreateChart("ResultDistribution", "Распределение результатов", _main);
         }
 
+        public void BuildKAndBDistributionsChart(DataAnalyserReport report)
+        {
+            (var kDistr, var bDistr) = report.GetAdditionalInfo();
+
+            // K Distribution
+            _temp.SetPos1();
+
+            foreach (var el in kDistr.Parts)
+            {
+                _temp.Write(string.Format("[{0:F2}; {1:F2})", el.LeftBorder, el.RightBorder));
+                _temp.WriteLine(el.NumericsAmount);
+            }
+
+            _temp.GoBack();
+            _temp.SetPos2();
+            _temp.WriteLine();
+            _temp.CreateChart("KDistribution", "Распределение коэффициента K", _main);
+
+            // B Distribution
+            _temp.SetPos1();
+
+            foreach (var el in bDistr.Parts)
+            {
+                _temp.Write(string.Format("[{0:F2}; {1:F2})", el.LeftBorder, el.RightBorder));
+                _temp.WriteLine(el.NumericsAmount);
+            }
+
+            _temp.GoBack();
+            _temp.SetPos2();
+            _temp.WriteLine();
+            _temp.CreateChart("BDistribution", "Распределение коэффициента B", _main);
+        }
+
         public void Question(KeyValuePair<string, QuestionStatistics> qStatistics)
         {
             _questions.WriteLine(qStatistics.Key);
@@ -103,9 +136,12 @@ namespace QuizData.ExcelReport
 
             BuildAttemptDistributionChart(report);
             BuildResultDistributionChart(report);
+            BuildKAndBDistributionsChart(report);
 
             foreach (var el in report.QuestionStatistics)
                 Question(el);
+
+            
 
             //var max = 0U;
             //var userWithMax = "";
