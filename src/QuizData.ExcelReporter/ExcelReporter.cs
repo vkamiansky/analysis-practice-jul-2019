@@ -4,6 +4,7 @@ using System.Linq;
 using OfficeOpenXml;
 using QuizData.Analyser.Models;
 using System.Collections.Generic;
+using OfficeOpenXml.Drawing.Chart;
 
 namespace QuizData.ExcelReport
 {
@@ -141,7 +142,66 @@ namespace QuizData.ExcelReport
             foreach (var el in report.QuestionStatistics)
                 Question(el);
 
-            
+            (var kDistr, var bDistr) = report.GetAdditionalInfo();
+
+            var distr = new DoubleNumericDistribution(kDistr.LeftBorder, kDistr.RightBorder,
+                bDistr.LeftBorder, bDistr.RightBorder, 10);
+
+            foreach (var el in report.PersonStatistics)
+            {
+                if (el.Value.AdditionalInfo != null)
+                {
+                    distr.AddNumerics(el.Value.AdditionalInfo.Value.K, el.Value.AdditionalInfo.Value.B);
+                }
+            }
+
+
+
+            _temp.WriteLine();
+            _temp.WriteLine();
+            _temp.WriteLine();
+
+            _temp.Write("");
+            for (var i = 1; i < 11; i++)
+            {
+                _temp.Write(i);
+            }
+
+            _temp.WriteLine();
+
+            _temp.Write();
+            _temp.SetPos1();
+            _temp.GoBack();
+
+            for (var i = 1; i < 11; i++)
+            {
+                _temp.Write(i);
+                for (var j = (i - 1) * 10; j < (i - 1) * 10 + 10; j++)
+                {
+                    _temp.Write(distr.Parts.ElementAt(j).NumericsAmount);
+                }
+                _temp.WriteLine();
+            }
+
+            _temp.GoBack();
+            _temp.SetPos2();
+
+            var chart = _main.Worksheet.Drawings.AddChart("WhatIsItSurface", eChartType.Surface);
+            chart.Title.Text = "Распределение по K и B";
+            for (var i = 82; i < 92; i++)
+            {
+                var address1 = string.Format("B{0}:K{0}", i);
+                var address2 = "A82:A91";
+                chart.Series.Add(ExcelRange.GetFullAddress(_temp.Worksheet.Name, address1),
+                    ExcelRange.GetFullAddress(_temp.Worksheet.Name, address2));
+            }
+            chart.Legend.Position = eLegendPosition.Right;
+
+            _main.PlaceChart(chart);
+
+
+
+
 
             //var max = 0U;
             //var userWithMax = "";

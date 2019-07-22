@@ -35,11 +35,16 @@ namespace QuizData.ExcelReport
             CanGoBack = true;
         }
 
+        public void Write()
+        {
+            CopyToPrevious();
+            _currentColumn++;
+        }
+
         public void Write(object value)
         {
             Worksheet.Cells[_currentLine, _currentColumn].Value = value;
-            CopyToPrevious();
-            _currentColumn++;
+            Write();
         }
 
         public void WriteLine()

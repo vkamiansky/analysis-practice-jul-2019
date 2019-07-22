@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace QuizData.Analyser.Models
 {
@@ -46,6 +47,22 @@ namespace QuizData.Analyser.Models
             }
 
             return false;
+        }
+
+        public double LeftBorder
+        {
+            get
+            {
+                return Parts.First().LeftBorder;
+            }
+        }
+
+        public double RightBorder
+        {
+            get
+            {
+                return Parts.Last().RightBorder;
+            }
         }
     }
 }
