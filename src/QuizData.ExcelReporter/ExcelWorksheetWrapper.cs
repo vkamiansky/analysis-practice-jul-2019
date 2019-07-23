@@ -7,8 +7,8 @@ namespace QuizData.ExcelReport
     {
         public ExcelWorksheet Worksheet { get; }
 
-        private int _currentLine;
-        private int _currentColumn;
+        public int CurrentLine { get; private set; }
+        public int CurrentColumn { get; private set; }
 
         private int _pos1Line;
         private int _pos1Column;
@@ -24,42 +24,42 @@ namespace QuizData.ExcelReport
         public ExcelWorksheetWrapper(ExcelWorksheet worksheet)
         {
             Worksheet = worksheet;
-            _currentLine = 1;
-            _currentColumn = 1;
+            CurrentLine = 1;
+            CurrentColumn = 1;
         }
 
         private void CopyToPrevious()
         {
-            _previousStepLine = _currentLine;
-            _previousStepColumn = _currentColumn;
+            _previousStepLine = CurrentLine;
+            _previousStepColumn = CurrentColumn;
             CanGoBack = true;
         }
 
         public void Write()
         {
             CopyToPrevious();
-            _currentColumn++;
+            CurrentColumn++;
         }
 
         public void Write(object value)
         {
-            Worksheet.Cells[_currentLine, _currentColumn].Value = value;
+            Worksheet.Cells[CurrentLine, CurrentColumn].Value = value;
             Write();
         }
 
         public void WriteLine()
         {
             CopyToPrevious();
-            _currentLine++;
-            _currentColumn = 1;
+            CurrentLine++;
+            CurrentColumn = 1;
         }
 
         public void WriteLine(object value)
         {
-            Worksheet.Cells[_currentLine, _currentColumn].Value = value;
+            Worksheet.Cells[CurrentLine, CurrentColumn].Value = value;
             CopyToPrevious();
-            _currentLine++;
-            _currentColumn = 1;
+            CurrentLine++;
+            CurrentColumn = 1;
         }
 
         public void GoBack()
@@ -67,30 +67,30 @@ namespace QuizData.ExcelReport
             if (!CanGoBack)
                 throw new System.Exception("Something went wrong...");
 
-            _currentColumn = _previousStepColumn;
-            _currentLine = _previousStepLine;
+            CurrentColumn = _previousStepColumn;
+            CurrentLine = _previousStepLine;
 
             CanGoBack = false;
         }
 
         public void SetPos1()
         {
-            _pos1Line = _currentLine;
-            _pos1Column = _currentColumn;
+            _pos1Line = CurrentLine;
+            _pos1Column = CurrentColumn;
         }
 
         public void SetPos2()
         {
-            _pos2Line = _currentLine;
-            _pos2Column = _currentColumn;
+            _pos2Line = CurrentLine;
+            _pos2Column = CurrentColumn;
         }
 
-        public void CreateChart(string chartName, string chartTitle)
+        public void CreateChart(string chartName, string chartTitle, int height = 10)
         {
-            CreateChart(chartName, chartTitle, this);
+            CreateChart(chartName, chartTitle, this, height);
         }
 
-        public void CreateChart(string chartName, string chartTitle, ExcelWorksheetWrapper to)
+        public void CreateChart(string chartName, string chartTitle, ExcelWorksheetWrapper to, int height = 10)
         {
             var chart = to.Worksheet.Drawings.AddChart(chartName, eChartType.ColumnClustered);
             chart.Title.Text = chartTitle;
@@ -102,14 +102,14 @@ namespace QuizData.ExcelReport
                 ExcelRange.GetFullAddress(Worksheet.Name, address2));
             chart.Legend.Remove();
 
-            to.PlaceChart(chart);
+            to.PlaceChart(chart, height);
         }
 
-        public void PlaceChart(ExcelChart chart)
+        public void PlaceChart(ExcelChart chart, int height = 10)
         {
-            chart.From.Row = _currentLine;
-            chart.To.Row = _currentLine + 10;
-            _currentLine += 11;
+            chart.From.Row = CurrentLine;
+            chart.To.Row = CurrentLine + height;
+            CurrentLine += height + 1;
         }
     }
 }

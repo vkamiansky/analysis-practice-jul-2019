@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
 using OfficeOpenXml;
 using QuizData.Analyser.Models;
@@ -8,7 +7,7 @@ using OfficeOpenXml.Drawing.Chart;
 
 namespace QuizData.ExcelReport
 {
-	public class ExcelReporter
+    public class ExcelReporter
 	{
         private ExcelPackage _package;
         private ExcelWorksheetWrapper _main;
@@ -61,14 +60,11 @@ namespace QuizData.ExcelReport
             _temp.CreateChart("ResultDistribution", "Распределение результатов", _main);
         }
 
-        public void BuildKAndBDistributionsChart(DataAnalyserReport report)
+        public void BuildDistributionChart(NumericDistribution distribution)
         {
-            (var kDistr, var bDistr) = report.GetAdditionalInfo();
-
-            // K Distribution
             _temp.SetPos1();
 
-            foreach (var el in kDistr.Parts)
+            foreach (var el in distribution.Parts)
             {
                 _temp.Write(string.Format("[{0:F2}; {1:F2})", el.LeftBorder, el.RightBorder));
                 _temp.WriteLine(el.NumericsAmount);
@@ -77,24 +73,170 @@ namespace QuizData.ExcelReport
             _temp.GoBack();
             _temp.SetPos2();
             _temp.WriteLine();
-            _temp.CreateChart("KDistribution", "Распределение коэффициента K", _main);
-
-            // B Distribution
-            _temp.SetPos1();
-
-            foreach (var el in bDistr.Parts)
-            {
-                _temp.Write(string.Format("[{0:F2}; {1:F2})", el.LeftBorder, el.RightBorder));
-                _temp.WriteLine(el.NumericsAmount);
-            }
-
-            _temp.GoBack();
-            _temp.SetPos2();
-            _temp.WriteLine();
-            _temp.CreateChart("BDistribution", "Распределение коэффициента B", _main);
+            _temp.CreateChart("Distribution-" + distribution.GetHashCode(),
+                "Распределение коэффициента K", _main);
         }
 
-        public void Question(KeyValuePair<string, QuestionStatistics> qStatistics)
+        public void BuildKAndBDistributionsChart(DoubleNumericDistribution distribution)
+        {
+            _temp.Write("");
+            for (var i = 1; i < 11; i++)
+            {
+                _temp.Write(i);
+            }
+
+            _temp.WriteLine();
+
+            _temp.Write();
+
+            var dataStartLine = _temp.CurrentLine;
+            var dataStartColumn = _temp.CurrentColumn;
+
+            _temp.GoBack();
+
+            for (var i = 1; i < 11; i++)
+            {
+                _temp.Write(i);
+                for (var j = (i - 1) * 10; j < (i - 1) * 10 + 10; j++)
+                {
+                    _temp.Write(distribution.Parts.ElementAt(j).NumericsAmount);
+                }
+                _temp.WriteLine();
+            }
+
+            _temp.GoBack();
+            _temp.SetPos2();
+
+            var chart = _main.Worksheet.Drawings.AddChart("WhatIsItSurface", eChartType.Surface);
+            chart.Title.Text = "Распределение по K и B";
+            for (var i = dataStartLine; i <= _temp.CurrentLine; i++)
+            {
+                var address1 = string.Format("B{0}:K{0}", i);
+                var address2 = string.Format("A{0}:A{1}", dataStartLine, _temp.CurrentLine);
+                var serie = chart.Series.Add(ExcelRange.GetFullAddress(_temp.Worksheet.Name, address1),
+                    ExcelRange.GetFullAddress(_temp.Worksheet.Name, address2));
+                serie.Header = _temp.Worksheet.Cells[string.Format("A{0}", i)].Value.ToString();
+            }
+            chart.Legend.Position = eLegendPosition.Right;
+            chart.XAxis.Title.Text = "K";
+            chart.YAxis.Title.Text = "Количество человек";
+            chart.Axis[2].Title.Text = "B";
+
+            foreach (var axis in chart.Axis)
+                axis.Title.Font.Size = 12;
+
+            _main.PlaceChart(chart, 20);
+
+            _temp.WriteLine();
+        }
+
+        public void BuildSigmaMinDistributionsChart(DoubleNumericDistribution distribution)
+        {
+            _temp.Write("");
+            for (var i = 1; i < 11; i++)
+            {
+                _temp.Write(i);
+            }
+
+            _temp.WriteLine();
+
+            _temp.Write();
+
+            var dataStartLine = _temp.CurrentLine;
+            var dataStartColumn = _temp.CurrentColumn;
+
+            _temp.GoBack();
+
+            for (var i = 1; i < 11; i++)
+            {
+                _temp.Write(i);
+                for (var j = (i - 1) * 10; j < (i - 1) * 10 + 10; j++)
+                {
+                    _temp.Write(distribution.Parts.ElementAt(j).SigmaMin);
+                }
+                _temp.WriteLine();
+            }
+
+            _temp.GoBack();
+            _temp.SetPos2();
+
+            var chart = _main.Worksheet.Drawings.AddChart("WhatIsItSurfaceSM", eChartType.Surface);
+            chart.Title.Text = "Распределение по K и B SigmaMin";
+            for (var i = dataStartLine; i <= _temp.CurrentLine; i++)
+            {
+                var address1 = string.Format("B{0}:K{0}", i);
+                var address2 = string.Format("A{0}:A{1}", dataStartLine, _temp.CurrentLine);
+                var serie = chart.Series.Add(ExcelRange.GetFullAddress(_temp.Worksheet.Name, address1),
+                    ExcelRange.GetFullAddress(_temp.Worksheet.Name, address2));
+                serie.Header = _temp.Worksheet.Cells[string.Format("A{0}", i)].Value.ToString();
+            }
+            chart.Legend.Position = eLegendPosition.Right;
+            chart.XAxis.Title.Text = "K";
+            chart.YAxis.Title.Text = "SigmaMin";
+            chart.Axis[2].Title.Text = "B";
+
+            foreach (var axis in chart.Axis)
+                axis.Title.Font.Size = 12;
+
+            _main.PlaceChart(chart, 20);
+
+            _temp.WriteLine();
+        }
+
+        public void BuildSigmaMaxDistributionsChart(DoubleNumericDistribution distribution)
+        {
+            _temp.Write("");
+            for (var i = 1; i < 11; i++)
+            {
+                _temp.Write(i);
+            }
+
+            _temp.WriteLine();
+
+            _temp.Write();
+
+            var dataStartLine = _temp.CurrentLine;
+            var dataStartColumn = _temp.CurrentColumn;
+
+            _temp.GoBack();
+
+            for (var i = 1; i < 11; i++)
+            {
+                _temp.Write(i);
+                for (var j = (i - 1) * 10; j < (i - 1) * 10 + 10; j++)
+                {
+                    _temp.Write(distribution.Parts.ElementAt(j).SigmaMax);
+                }
+                _temp.WriteLine();
+            }
+
+            _temp.GoBack();
+            _temp.SetPos2();
+
+            var chart = _main.Worksheet.Drawings.AddChart("WhatIsItSurfaceSMax", eChartType.Surface);
+            chart.Title.Text = "Распределение по K и B SigmaMax";
+            for (var i = dataStartLine; i <= _temp.CurrentLine; i++)
+            {
+                var address1 = string.Format("B{0}:K{0}", i);
+                var address2 = string.Format("A{0}:A{1}", dataStartLine, _temp.CurrentLine);
+                var serie = chart.Series.Add(ExcelRange.GetFullAddress(_temp.Worksheet.Name, address1),
+                    ExcelRange.GetFullAddress(_temp.Worksheet.Name, address2));
+                serie.Header = _temp.Worksheet.Cells[string.Format("A{0}", i)].Value.ToString();
+            }
+            chart.Legend.Position = eLegendPosition.Right;
+            chart.XAxis.Title.Text = "K";
+            chart.YAxis.Title.Text = "SigmaMax";
+            chart.Axis[2].Title.Text = "B";
+
+            foreach (var axis in chart.Axis)
+                axis.Title.Font.Size = 12;
+
+            _main.PlaceChart(chart, 20);
+
+            _temp.WriteLine();
+        }
+
+        public void BuildQuestionStatistics(KeyValuePair<string, QuestionStatistics> qStatistics)
         {
             _questions.WriteLine(qStatistics.Key);
 
@@ -122,7 +264,7 @@ namespace QuizData.ExcelReport
             _temp.GoBack();
             _temp.SetPos2();
             _temp.WriteLine();
-            _temp.CreateChart("QuestionStatistics" + qStatistics.Key.GetHashCode(),
+            _temp.CreateChart("QuestionStatistics-" + qStatistics.Key.GetHashCode(),
                 "Ответы пользователей", _questions);
             _questions.WriteLine();
         }
@@ -137,12 +279,10 @@ namespace QuizData.ExcelReport
 
             BuildAttemptDistributionChart(report);
             BuildResultDistributionChart(report);
-            BuildKAndBDistributionsChart(report);
-
-            foreach (var el in report.QuestionStatistics)
-                Question(el);
 
             (var kDistr, var bDistr) = report.GetAdditionalInfo();
+            BuildDistributionChart(kDistr);
+            BuildDistributionChart(bDistr);
 
             var distr = new DoubleNumericDistribution(kDistr.LeftBorder, kDistr.RightBorder,
                 bDistr.LeftBorder, bDistr.RightBorder, 10);
@@ -151,86 +291,18 @@ namespace QuizData.ExcelReport
             {
                 if (el.Value.AdditionalInfo != null)
                 {
-                    distr.AddNumerics(el.Value.AdditionalInfo.Value.K, el.Value.AdditionalInfo.Value.B);
+                    distr.AddNumerics(el.Value.AdditionalInfo.Value.K,
+                        el.Value.AdditionalInfo.Value.B,
+                        el.Value.AdditionalInfo.Value.R);
                 }
             }
 
+            BuildKAndBDistributionsChart(distr);
+            BuildSigmaMinDistributionsChart(distr);
+            BuildSigmaMaxDistributionsChart(distr);
 
-
-            _temp.WriteLine();
-            _temp.WriteLine();
-            _temp.WriteLine();
-
-            _temp.Write("");
-            for (var i = 1; i < 11; i++)
-            {
-                _temp.Write(i);
-            }
-
-            _temp.WriteLine();
-
-            _temp.Write();
-            _temp.SetPos1();
-            _temp.GoBack();
-
-            for (var i = 1; i < 11; i++)
-            {
-                _temp.Write(i);
-                for (var j = (i - 1) * 10; j < (i - 1) * 10 + 10; j++)
-                {
-                    _temp.Write(distr.Parts.ElementAt(j).NumericsAmount);
-                }
-                _temp.WriteLine();
-            }
-
-            _temp.GoBack();
-            _temp.SetPos2();
-
-            var chart = _main.Worksheet.Drawings.AddChart("WhatIsItSurface", eChartType.Surface);
-            chart.Title.Text = "Распределение по K и B";
-            for (var i = 82; i < 92; i++)
-            {
-                var address1 = string.Format("B{0}:K{0}", i);
-                var address2 = "A82:A91";
-                chart.Series.Add(ExcelRange.GetFullAddress(_temp.Worksheet.Name, address1),
-                    ExcelRange.GetFullAddress(_temp.Worksheet.Name, address2));
-            }
-            chart.Legend.Position = eLegendPosition.Right;
-
-            _main.PlaceChart(chart);
-
-
-
-
-
-            //var max = 0U;
-            //var userWithMax = "";
-            //foreach (var pStatistics in report.PersonStatistics)
-            //{
-            //	if (pStatistics.Value.AmountOfAttempts > max)
-            //	{
-            //		max = pStatistics.Value.AmountOfAttempts;
-            //		userWithMax = pStatistics.Key;
-            //	}
-            //}
-
-
-
-
-
-            //         _main.Cells[20, 1].Value = string.Format("Результаты пользователя {0}", userWithMax);
-            //currentLineNumber = 21;
-            //for (var i = 0; i < report.PersonStatistics[userWithMax].Results.Count; i++)
-            //{
-            //	_main.Cells[currentLineNumber, 1].Value = i + 1;
-            //	_main.Cells[currentLineNumber, 2].Value = report.PersonStatistics[userWithMax].Results[i];
-            //	currentLineNumber++;
-            //}
-
-            //var chart2 = _main.Drawings.AddChart("chart2", OfficeOpenXml.Drawing.Chart.eChartType.Line);
-            //var chartSerie = chart2.Series.Add(ExcelRange.GetAddress(21, 2, 62, 2), ExcelRange.GetAddress(21, 1, 62, 1));
-            //var trend = chartSerie.TrendLines.Add(OfficeOpenXml.Drawing.Chart.eTrendLine.Linear);
-            //trend.DisplayRSquaredValue = false;
+            foreach (var el in report.QuestionStatistics)
+                BuildQuestionStatistics(el);
 
             _package.SaveAs(new FileInfo(path));
 		}

@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using QuizData.Analyser.Models;
 using QuizData.Parser.Models;
 
 namespace QuizData.Analyser
 {
-	public static class DataAnalyser
+    public static class DataAnalyser
 	{
         private static uint _minNumberForAdvStat;
 

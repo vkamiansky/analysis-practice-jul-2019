@@ -40,11 +40,11 @@ namespace QuizData.Analyser.Models
             Parts.Add(new DoubleNumericDistributionPart(a, b));
         }
 
-        public bool AddNumerics(double numeric1, double numeric2)
+        public bool AddNumerics(double numeric1, double numeric2, double sigma)
         {
             foreach (var part in Parts)
             {
-                if (part.AddNumeric(numeric1, numeric2))
+                if (part.AddNumeric(numeric1, numeric2, sigma))
                 {
                     return true;
                 }
