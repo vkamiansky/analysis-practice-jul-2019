@@ -8,7 +8,7 @@ using OfficeOpenXml.Drawing.Chart;
 namespace QuizData.ExcelReport
 {
     public class ExcelReporter
-	{
+    {
         private ExcelPackage _package;
         private ExcelWorksheetWrapper _main;
         private ExcelWorksheetWrapper _temp;
@@ -22,16 +22,16 @@ namespace QuizData.ExcelReport
             _questions = new ExcelWorksheetWrapper(_package.Workbook.Worksheets.Add("Вопросы"));
         }
 
-        public void BuildAttemptDistributionChart(DataAnalyserReport report)
+        public void BuildAttemptDistributionChart(uint[] attemptDistribution)
         {
             _temp.SetPos1();
 
-            for (var i = 0; i < report.AttemptDistribution.Length; i++)
+            for (var i = 0; i < attemptDistribution.Length; i++)
             {
-                if (report.AttemptDistribution[i] != 0)
+                if (attemptDistribution[i] != 0)
                 {
                     _temp.Write(i + 1);
-                    _temp.WriteLine(report.AttemptDistribution[i]);
+                    _temp.WriteLine(attemptDistribution[i]);
                 }
             }
 
@@ -41,11 +41,11 @@ namespace QuizData.ExcelReport
             _temp.CreateChart("AttemptDistribution", "Распределение попыток", _main);
         }
 
-        public void BuildResultDistributionChart(DataAnalyserReport report)
+        public void BuildResultDistributionChart(Dictionary<uint, uint> resultDistribution)
         {
             _temp.SetPos1();
 
-            var list = report.ResultDistribution.ToList();
+            var list = resultDistribution.ToList();
             list.Sort((pair1, pair2) => pair1.Key.CompareTo(pair2.Key));
 
             foreach (var el in list)
@@ -60,7 +60,8 @@ namespace QuizData.ExcelReport
             _temp.CreateChart("ResultDistribution", "Распределение результатов", _main);
         }
 
-        public void BuildDistributionChart(NumericDistribution distribution)
+        public void BuildNumericDistributionChart(NumericDistribution distribution,
+            string chartName, string chartTitle)
         {
             _temp.SetPos1();
 
@@ -73,8 +74,7 @@ namespace QuizData.ExcelReport
             _temp.GoBack();
             _temp.SetPos2();
             _temp.WriteLine();
-            _temp.CreateChart("Distribution-" + distribution.GetHashCode(),
-                "Распределение коэффициента K", _main);
+            _temp.CreateChart(chartName, chartTitle, _main);
         }
 
         public void BuildKAndBDistributionsChart(DoubleNumericDistribution distribution)
@@ -84,15 +84,9 @@ namespace QuizData.ExcelReport
             {
                 _temp.Write(i);
             }
-
             _temp.WriteLine();
 
-            _temp.Write();
-
-            var dataStartLine = _temp.CurrentLine;
-            var dataStartColumn = _temp.CurrentColumn;
-
-            _temp.GoBack();
+            _temp.SetPos1();
 
             for (var i = 1; i < 11; i++)
             {
@@ -107,45 +101,22 @@ namespace QuizData.ExcelReport
             _temp.GoBack();
             _temp.SetPos2();
 
-            var chart = _main.Worksheet.Drawings.AddChart("WhatIsItSurface", eChartType.Surface);
-            chart.Title.Text = "Распределение по K и B";
-            for (var i = dataStartLine; i <= _temp.CurrentLine; i++)
-            {
-                var address1 = string.Format("B{0}:K{0}", i);
-                var address2 = string.Format("A{0}:A{1}", dataStartLine, _temp.CurrentLine);
-                var serie = chart.Series.Add(ExcelRange.GetFullAddress(_temp.Worksheet.Name, address1),
-                    ExcelRange.GetFullAddress(_temp.Worksheet.Name, address2));
-                serie.Header = _temp.Worksheet.Cells[string.Format("A{0}", i)].Value.ToString();
-            }
-            chart.Legend.Position = eLegendPosition.Right;
-            chart.XAxis.Title.Text = "K";
-            chart.YAxis.Title.Text = "Количество человек";
-            chart.Axis[2].Title.Text = "B";
-
-            foreach (var axis in chart.Axis)
-                axis.Title.Font.Size = 12;
-
-            _main.PlaceChart(chart, 20);
+            _temp.Create3DChart("KnBDistribution", "Распределение по K и B",
+                _main, new[] { "K", "Количество человек", "B" });
 
             _temp.WriteLine();
         }
 
-        public void BuildSigmaMinDistributionsChart(DoubleNumericDistribution distribution)
+        public void BuildSigmaMinDistributionChart(DoubleNumericDistribution distribution)
         {
             _temp.Write("");
             for (var i = 1; i < 11; i++)
             {
                 _temp.Write(i);
             }
-
             _temp.WriteLine();
 
-            _temp.Write();
-
-            var dataStartLine = _temp.CurrentLine;
-            var dataStartColumn = _temp.CurrentColumn;
-
-            _temp.GoBack();
+            _temp.SetPos1();
 
             for (var i = 1; i < 11; i++)
             {
@@ -160,45 +131,22 @@ namespace QuizData.ExcelReport
             _temp.GoBack();
             _temp.SetPos2();
 
-            var chart = _main.Worksheet.Drawings.AddChart("WhatIsItSurfaceSM", eChartType.Surface);
-            chart.Title.Text = "Распределение по K и B SigmaMin";
-            for (var i = dataStartLine; i <= _temp.CurrentLine; i++)
-            {
-                var address1 = string.Format("B{0}:K{0}", i);
-                var address2 = string.Format("A{0}:A{1}", dataStartLine, _temp.CurrentLine);
-                var serie = chart.Series.Add(ExcelRange.GetFullAddress(_temp.Worksheet.Name, address1),
-                    ExcelRange.GetFullAddress(_temp.Worksheet.Name, address2));
-                serie.Header = _temp.Worksheet.Cells[string.Format("A{0}", i)].Value.ToString();
-            }
-            chart.Legend.Position = eLegendPosition.Right;
-            chart.XAxis.Title.Text = "K";
-            chart.YAxis.Title.Text = "SigmaMin";
-            chart.Axis[2].Title.Text = "B";
-
-            foreach (var axis in chart.Axis)
-                axis.Title.Font.Size = 12;
-
-            _main.PlaceChart(chart, 20);
+            _temp.Create3DChart("SigmaMinDistribution", "Распределение по K и B SigmaMin",
+                _main, new[] { "K", "SigmaMin", "B" });
 
             _temp.WriteLine();
         }
 
-        public void BuildSigmaMaxDistributionsChart(DoubleNumericDistribution distribution)
+        public void BuildSigmaMaxDistributionChart(DoubleNumericDistribution distribution)
         {
             _temp.Write("");
             for (var i = 1; i < 11; i++)
             {
                 _temp.Write(i);
             }
-
             _temp.WriteLine();
 
-            _temp.Write();
-
-            var dataStartLine = _temp.CurrentLine;
-            var dataStartColumn = _temp.CurrentColumn;
-
-            _temp.GoBack();
+            _temp.SetPos1();
 
             for (var i = 1; i < 11; i++)
             {
@@ -213,25 +161,8 @@ namespace QuizData.ExcelReport
             _temp.GoBack();
             _temp.SetPos2();
 
-            var chart = _main.Worksheet.Drawings.AddChart("WhatIsItSurfaceSMax", eChartType.Surface);
-            chart.Title.Text = "Распределение по K и B SigmaMax";
-            for (var i = dataStartLine; i <= _temp.CurrentLine; i++)
-            {
-                var address1 = string.Format("B{0}:K{0}", i);
-                var address2 = string.Format("A{0}:A{1}", dataStartLine, _temp.CurrentLine);
-                var serie = chart.Series.Add(ExcelRange.GetFullAddress(_temp.Worksheet.Name, address1),
-                    ExcelRange.GetFullAddress(_temp.Worksheet.Name, address2));
-                serie.Header = _temp.Worksheet.Cells[string.Format("A{0}", i)].Value.ToString();
-            }
-            chart.Legend.Position = eLegendPosition.Right;
-            chart.XAxis.Title.Text = "K";
-            chart.YAxis.Title.Text = "SigmaMax";
-            chart.Axis[2].Title.Text = "B";
-
-            foreach (var axis in chart.Axis)
-                axis.Title.Font.Size = 12;
-
-            _main.PlaceChart(chart, 20);
+            _temp.Create3DChart("SigmaMaxDistribution", "Распределение по K и B SigmaMax",
+                _main, new[] { "K", "SigmaMax", "B" });
 
             _temp.WriteLine();
         }
@@ -270,19 +201,19 @@ namespace QuizData.ExcelReport
         }
 
         public void ToFile(string path, DataAnalyserReport report)
-		{
+        {
             _main.Write("Всего тестов:");
-			_main.WriteLine(report.TotalAmountOfTests);
+            _main.WriteLine(report.TotalAmountOfTests);
 
             _main.Write("Количество уникальных e-mail'ов:");
             _main.WriteLine(report.AmountOfUniqueEmails);
 
-            BuildAttemptDistributionChart(report);
-            BuildResultDistributionChart(report);
+            BuildAttemptDistributionChart(report.AttemptDistribution);
+            BuildResultDistributionChart(report.ResultDistribution);
 
             (var kDistr, var bDistr) = report.GetAdditionalInfo();
-            BuildDistributionChart(kDistr);
-            BuildDistributionChart(bDistr);
+            BuildNumericDistributionChart(kDistr, "KDistribution", "Распределение коэффициента K");
+            BuildNumericDistributionChart(bDistr, "BDistribution", "Распределение коэффициента B");
 
             var distr = new DoubleNumericDistribution(kDistr.LeftBorder, kDistr.RightBorder,
                 bDistr.LeftBorder, bDistr.RightBorder, 10);
@@ -298,13 +229,13 @@ namespace QuizData.ExcelReport
             }
 
             BuildKAndBDistributionsChart(distr);
-            BuildSigmaMinDistributionsChart(distr);
-            BuildSigmaMaxDistributionsChart(distr);
+            BuildSigmaMinDistributionChart(distr);
+            BuildSigmaMaxDistributionChart(distr);
 
             foreach (var el in report.QuestionStatistics)
                 BuildQuestionStatistics(el);
 
             _package.SaveAs(new FileInfo(path));
-		}
-	}
+        }
+    }
 }

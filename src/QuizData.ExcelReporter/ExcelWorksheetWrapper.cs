@@ -105,6 +105,35 @@ namespace QuizData.ExcelReport
             to.PlaceChart(chart, height);
         }
 
+        public void Create3DChart(string chartName, string chartTitle, ExcelWorksheetWrapper to,
+            string[] axisTitles, int height = 20)
+        {
+            var chart = to.Worksheet.Drawings.AddChart(chartName, eChartType.Surface);
+            chart.Title.Text = chartTitle;
+            for (var i = _pos1Line; i <= _pos2Line; i++)
+            {
+                var signaturesAddress = string.Format("{0}{1}:{0}{2}", (char)(_pos1Column + 64),
+                    _pos1Line, _pos2Line);
+                var dataAddress = string.Format("{0}{1}:{2}{1}", (char)(_pos1Column + 64 + 1),
+                    i, (char)(_pos2Column + 64));
+                var serie = chart.Series.Add(ExcelRange.GetFullAddress(Worksheet.Name, dataAddress),
+                    ExcelRange.GetFullAddress(Worksheet.Name, signaturesAddress));
+                serie.Header = Worksheet.Cells[string.Format("{0}{1}", (char)(_pos1Column + 64), i)].Value.ToString();
+            }
+            chart.Legend.Position = eLegendPosition.Right;
+            chart.XAxis.Title.Text = axisTitles[0];
+            chart.YAxis.Title.Text = "SigmaMin";
+            chart.Axis[2].Title.Text = "B";
+
+            for (var i = 0; i < chart.Axis.Length; i++)
+            {
+                chart.Axis[i].Title.Text = axisTitles[i];
+                chart.Axis[i].Title.Font.Size = 12;
+            }
+
+            to.PlaceChart(chart, 20);
+        }
+
         public void PlaceChart(ExcelChart chart, int height = 10)
         {
             chart.From.Row = CurrentLine;
