@@ -8,7 +8,7 @@ namespace QuizData.TextReport
 	{
 		public static void ToStream(Stream stream, DataAnalyserReport report, int bufferSize = 4 * 1024)
 		{
-			using (var writer = new StreamWriter(stream, Encoding.UTF8, bufferSize))
+			using (var writer = new StreamWriter(stream, Encoding.UTF8, bufferSize, true))
 			{
 				writer.WriteLine("Всего тестов: {0}", report.TotalAmountOfTests);
 				writer.WriteLine("Количество уникальных e-mail'ов: {0}\n", report.AmountOfUniqueEmails);

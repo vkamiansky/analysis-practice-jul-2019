@@ -200,7 +200,7 @@ namespace QuizData.ExcelReport
             _questions.WriteLine();
         }
 
-        public void ToFile(string path, DataAnalyserReport report)
+        public void ToStream(Stream stream, DataAnalyserReport report)
         {
             _main.Write("Всего тестов:");
             _main.WriteLine(report.TotalAmountOfTests);
@@ -235,7 +235,7 @@ namespace QuizData.ExcelReport
             foreach (var el in report.QuestionStatistics)
                 BuildQuestionStatistics(el);
 
-            _package.SaveAs(new FileInfo(path));
+            _package.SaveAs(stream);
         }
     }
 }
