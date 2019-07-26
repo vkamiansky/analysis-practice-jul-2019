@@ -4,13 +4,13 @@
     /// Stores the number of numerics belonging the interval from the left border including
     /// to the right border excluding
     /// </summary>
-    public class NumericDistributionPart
+    public class NumericDistributionInterval
     {
         public double LeftBorder { get; }
         public double RightBorder { get; }
         public uint NumericsAmount { get; private set; }
 
-        public NumericDistributionPart(double leftBorder, double rightBorder)
+        public NumericDistributionInterval(double leftBorder, double rightBorder)
         {
             LeftBorder = leftBorder;
             RightBorder = rightBorder;

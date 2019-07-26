@@ -4,30 +4,30 @@ using System.Linq;
 namespace QuizData.Analyser.Models
 {
     /// <summary>
-    /// Represents number distribution
+    /// Represents numeric distribution
     /// </summary>
     public class NumericDistribution
     {
-        public List<NumericDistributionPart> Parts { get; set; }
+        public List<NumericDistributionInterval> Intervals { get; set; }
 
         /// <summary>
         /// Creates distibution with no data
         /// </summary>
         /// <param name="leftBorder">Left border on the number axis</param>
         /// <param name="rightBorder">Right border on the number axis</param>
-        /// <param name="rangesCount">The number of ranges into which the numbers will be divided</param>
-        public NumericDistribution(double leftBorder, double rightBorder, uint rangesCount)
+        /// <param name="intervalsAmount">The number of intervals into which the numbers will be divided</param>
+        public NumericDistribution(double leftBorder, double rightBorder, uint intervalsAmount)
         {
-            Parts = new List<NumericDistributionPart>((int)rangesCount);
+            Intervals = new List<NumericDistributionInterval>((int)intervalsAmount);
 
-            double step = (rightBorder - leftBorder) / rangesCount;
+            double step = (rightBorder - leftBorder) / intervalsAmount;
             var i = 0;
-            for ( ; i < rangesCount - 1; i++)
+            for ( ; i < intervalsAmount - 1; i++)
             {
-                Parts.Add(new NumericDistributionPart(leftBorder + step * i,
+                Intervals.Add(new NumericDistributionInterval(leftBorder + step * i,
                     leftBorder + step * (i + 1)));
             }
-            Parts.Add(new NumericDistributionPart(leftBorder + step * i,
+            Intervals.Add(new NumericDistributionInterval(leftBorder + step * i,
                     rightBorder + 0.0000000001));
         }
 
@@ -38,7 +38,7 @@ namespace QuizData.Analyser.Models
         /// <returns>Returns True if the number has been added</returns>
         public bool AddNumeric(double numeric)
         {
-            foreach (var part in Parts)
+            foreach (var part in Intervals)
             {
                 if (part.AddNumeric(numeric))
                 {
@@ -53,7 +53,7 @@ namespace QuizData.Analyser.Models
         {
             get
             {
-                return Parts.First().LeftBorder;
+                return Intervals.First().LeftBorder;
             }
         }
 
@@ -61,7 +61,7 @@ namespace QuizData.Analyser.Models
         {
             get
             {
-                return Parts.Last().RightBorder;
+                return Intervals.Last().RightBorder;
             }
         }
     }

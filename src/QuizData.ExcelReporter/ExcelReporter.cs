@@ -65,7 +65,7 @@ namespace QuizData.ExcelReport
         {
             _temp.SetPos1();
 
-            foreach (var el in distribution.Parts)
+            foreach (var el in distribution.Intervals)
             {
                 _temp.Write(string.Format("[{0:F2}; {1:F2})", el.LeftBorder, el.RightBorder));
                 _temp.WriteLine(el.NumericsAmount);

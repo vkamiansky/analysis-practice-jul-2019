@@ -43,14 +43,14 @@ namespace QuizData.TextReport
                 if (kDistribution != null && bDistribution != null)
                 {
                     writer.WriteLine("Распределение коэффициента K:");
-                    foreach (var el in kDistribution.Parts)
+                    foreach (var el in kDistribution.Intervals)
                     {
                         writer.WriteLine("В интервале от {0:F2} и до {1:F2}: {2}",
                             el.LeftBorder, el.RightBorder, el.NumericsAmount);
                     }
                     writer.WriteLine();
                     writer.WriteLine("Распределение коэффициента B:");
-                    foreach (var el in bDistribution.Parts)
+                    foreach (var el in bDistribution.Intervals)
                     {
                         writer.WriteLine("В интервале от {0:F2} и до {1:F2}: {2}",
                             el.LeftBorder, el.RightBorder, el.NumericsAmount);
