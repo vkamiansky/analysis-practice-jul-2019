@@ -212,25 +212,29 @@ namespace QuizData.ExcelReport
             BuildResultDistributionChart(report.ResultDistribution);
 
             (var kDistr, var bDistr) = report.GetAdditionalInfo();
-            BuildNumericDistributionChart(kDistr, "KDistribution", "Распределение коэффициента K");
-            BuildNumericDistributionChart(bDistr, "BDistribution", "Распределение коэффициента B");
 
-            var distr = new DoubleNumericDistribution(kDistr.LeftBorder, kDistr.RightBorder,
+            if (kDistr != null && bDistr != null)
+            {
+                BuildNumericDistributionChart(kDistr, "KDistribution", "Распределение коэффициента K");
+                BuildNumericDistributionChart(bDistr, "BDistribution", "Распределение коэффициента B");
+
+                var distr = new DoubleNumericDistribution(kDistr.LeftBorder, kDistr.RightBorder,
                 bDistr.LeftBorder, bDistr.RightBorder, 10);
 
-            foreach (var el in report.PersonStatistics)
-            {
-                if (el.Value.AdditionalInfo != null)
+                foreach (var el in report.PersonStatistics)
                 {
-                    distr.AddNumerics(el.Value.AdditionalInfo.Value.K,
-                        el.Value.AdditionalInfo.Value.B,
-                        el.Value.AdditionalInfo.Value.R);
+                    if (el.Value.AdditionalInfo != null)
+                    {
+                        distr.AddNumerics(el.Value.AdditionalInfo.Value.K,
+                            el.Value.AdditionalInfo.Value.B,
+                            el.Value.AdditionalInfo.Value.R);
+                    }
                 }
-            }
 
-            BuildKAndBDistributionsChart(distr);
-            BuildSigmaMinDistributionChart(distr);
-            BuildSigmaMaxDistributionChart(distr);
+                BuildKAndBDistributionsChart(distr);
+                BuildSigmaMinDistributionChart(distr);
+                BuildSigmaMaxDistributionChart(distr);
+            }
 
             foreach (var el in report.QuestionStatistics)
                 BuildQuestionStatistics(el);
