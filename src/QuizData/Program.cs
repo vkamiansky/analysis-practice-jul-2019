@@ -24,19 +24,24 @@ namespace QuizData
 			var parser = new CsvParser();
 			var config = BuildConfiguration();
 			Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-			var encoding = EncodingDetector.GetEncoding(config["DataFilePath"]);
-			var data = parser.ParseFile(config["DataFilePath"], encoding);
+			var encoding = EncodingDetector.GetEncoding(config["data-file-path"]);
+			var data = parser.ParseFile(config["data-file-path"], encoding);
 			if (parser.ErrorMessage != null)
 			{
 				Console.WriteLine("Parsing failed");
 				Console.WriteLine(parser.ErrorMessage);
 			}
 
-			var report = DataAnalyser.Analyze(data);
-			using (var stream = new FileStream("report.txt", FileMode.Create))
-			{
-				TextReporter.ToStream(stream, report);
-			}
-		}
+			var report = DataAnalyser.Analyze(data, Convert.ToUInt32(config["min-number-for-adv-stat"]));
+            using (var stream = new FileStream("report.txt", FileMode.Create))
+            {
+                TextReporter.ToStream(stream, report);
+            }
+            var reporter = new ExcelReport.ExcelReporter();
+            using (var stream = new FileStream("report.xlsx", FileMode.Create))
+            {
+                reporter.ToStream(stream, report);
+            }
+        }
 	}
 }

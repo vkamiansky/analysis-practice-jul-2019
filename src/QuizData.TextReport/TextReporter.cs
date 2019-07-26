@@ -8,7 +8,7 @@ namespace QuizData.TextReport
 	{
 		public static void ToStream(Stream stream, DataAnalyserReport report, int bufferSize = 4 * 1024)
 		{
-			using (var writer = new StreamWriter(stream, Encoding.UTF8, bufferSize))
+			using (var writer = new StreamWriter(stream, Encoding.UTF8, bufferSize, true))
 			{
 				writer.WriteLine("Всего тестов: {0}", report.TotalAmountOfTests);
 				writer.WriteLine("Количество уникальных e-mail'ов: {0}\n", report.AmountOfUniqueEmails);
@@ -38,7 +38,26 @@ namespace QuizData.TextReport
 						el.Value.RightAnswerIndex, el.Value.AnswersDistribution[0], el.Value.AnswersDistribution[1],
 						el.Value.AnswersDistribution[2], el.Value.AnswersDistribution[3]);
 				}
-			}
+
+                (var kDistribution, var bDistribution) = report.GetAdditionalInfo();
+                if (kDistribution != null && bDistribution != null)
+                {
+                    writer.WriteLine("Распределение коэффициента K:");
+                    foreach (var el in kDistribution.Intervals)
+                    {
+                        writer.WriteLine("В интервале от {0:F2} и до {1:F2}: {2}",
+                            el.LeftBorder, el.RightBorder, el.NumericsAmount);
+                    }
+                    writer.WriteLine();
+                    writer.WriteLine("Распределение коэффициента B:");
+                    foreach (var el in bDistribution.Intervals)
+                    {
+                        writer.WriteLine("В интервале от {0:F2} и до {1:F2}: {2}",
+                            el.LeftBorder, el.RightBorder, el.NumericsAmount);
+                    }
+                    writer.WriteLine();
+                }
+            }
 		}
 	}
 }

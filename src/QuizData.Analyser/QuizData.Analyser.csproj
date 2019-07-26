@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <ProjectReference Include="..\QuizData.LinearApproximation\QuizData.LinearApproximation.csproj" />
     <ProjectReference Include="..\QuizData.Parser\QuizData.Parser.csproj" />
   </ItemGroup>
 

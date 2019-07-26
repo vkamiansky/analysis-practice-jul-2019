@@ -13,6 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\QuizData.ExcelReporter\QuizData.ExcelReport.csproj" />
     <ProjectReference Include="..\..\src\QuizData.TextReport\QuizData.TextReport.csproj" />
   </ItemGroup>
 

@@ -25,6 +25,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuizData.LinearApproximatio
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuizData.LinearApproximation.Test", "test\QuizData.LinearApproximation.Test\QuizData.LinearApproximation.Test.csproj", "{B19688E3-1CAD-4AAE-8752-1FA932AFA280}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuizData.ExcelReport", "src\QuizData.ExcelReporter\QuizData.ExcelReport.csproj", "{275FB19F-4765-4CC2-B982-A976A502213C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -67,6 +69,10 @@ Global
 		{B19688E3-1CAD-4AAE-8752-1FA932AFA280}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B19688E3-1CAD-4AAE-8752-1FA932AFA280}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B19688E3-1CAD-4AAE-8752-1FA932AFA280}.Release|Any CPU.Build.0 = Release|Any CPU
+		{275FB19F-4765-4CC2-B982-A976A502213C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{275FB19F-4765-4CC2-B982-A976A502213C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{275FB19F-4765-4CC2-B982-A976A502213C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{275FB19F-4765-4CC2-B982-A976A502213C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -81,6 +87,7 @@ Global
 		{5B92F848-48F2-4D8D-BAA8-19149F6AD36D} = {1AF68225-F3CB-4AB6-9B7F-61F8A5201B62}
 		{F31C26CD-6364-4B63-90B0-E543644F5FE3} = {C3AB0661-D6C3-490D-AF73-C5D4880AFF37}
 		{B19688E3-1CAD-4AAE-8752-1FA932AFA280} = {1AF68225-F3CB-4AB6-9B7F-61F8A5201B62}
+		{275FB19F-4765-4CC2-B982-A976A502213C} = {C3AB0661-D6C3-490D-AF73-C5D4880AFF37}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7A498A42-2551-4BA1-83B3-CAB7237C881A}
