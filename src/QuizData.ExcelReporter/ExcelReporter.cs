@@ -3,7 +3,6 @@ using System.Linq;
 using OfficeOpenXml;
 using QuizData.Analyser.Models;
 using System.Collections.Generic;
-using OfficeOpenXml.Drawing.Chart;
 
 namespace QuizData.ExcelReport
 {
@@ -22,53 +21,33 @@ namespace QuizData.ExcelReport
             _questions = new ExcelWorksheetWrapper(_package.Workbook.Worksheets.Add("Вопросы"));
         }
 
-        public void BuildAttemptDistributionChart(uint[] attemptDistribution)
+        public void BuildDistributionChart<T>(IEnumerable<T> distribution, string chartName, string chartTitle)
         {
             _temp.SetPos1();
 
-            for (var i = 0; i < attemptDistribution.Length; i++)
+            for (var i = 0; i < distribution.Count(); i++)
             {
-                if (attemptDistribution[i] != 0)
+                if (!distribution.ElementAt(i).Equals(default(T)))
                 {
                     _temp.Write(i + 1);
-                    _temp.WriteLine(attemptDistribution[i]);
+                    _temp.WriteLine(distribution.ElementAt(i));
                 }
             }
 
             _temp.GoBack();
             _temp.SetPos2();
             _temp.WriteLine();
-            _temp.CreateChart("AttemptDistribution", "Распределение попыток", _main);
+            _temp.CreateChart(chartName, chartTitle, _main);
         }
 
-        public void BuildResultDistributionChart(Dictionary<uint, uint> resultDistribution)
+        public void BuildDistributionChart<TKey, TValue>(IEnumerable<KeyValuePair<TKey, TValue>> distribution, string chartName, string chartTitle)
         {
             _temp.SetPos1();
 
-            var list = resultDistribution.ToList();
-            list.Sort((pair1, pair2) => pair1.Key.CompareTo(pair2.Key));
-
-            foreach (var el in list)
+            foreach (var el in distribution)
             {
                 _temp.Write(el.Key);
                 _temp.WriteLine(el.Value);
-            }
-
-            _temp.GoBack();
-            _temp.SetPos2();
-            _temp.WriteLine();
-            _temp.CreateChart("ResultDistribution", "Распределение результатов", _main);
-        }
-
-        public void BuildNumericDistributionChart(NumericDistribution distribution,
-            string chartName, string chartTitle)
-        {
-            _temp.SetPos1();
-
-            foreach (var el in distribution.Intervals)
-            {
-                _temp.Write(string.Format("[{0:F2}; {1:F2})", el.LeftBorder, el.RightBorder));
-                _temp.WriteLine(el.NumericsAmount);
             }
 
             _temp.GoBack();
@@ -208,15 +187,22 @@ namespace QuizData.ExcelReport
             _main.Write("Количество уникальных e-mail'ов:");
             _main.WriteLine(report.AmountOfUniqueEmails);
 
-            BuildAttemptDistributionChart(report.AttemptDistribution);
-            BuildResultDistributionChart(report.ResultDistribution);
+            BuildDistributionChart(report.AttemptDistribution, "AttemptDistribution", "Распределение попыток");
+
+            var list = report.ResultDistribution.ToList();
+            list.Sort((pair1, pair2) => pair1.Key.CompareTo(pair2.Key));
+
+            BuildDistributionChart(list, "ResultDistribution", "Распределение результатов");
 
             (var kDistr, var bDistr) = report.GetAdditionalInfo();
 
             if (kDistr != null && bDistr != null)
             {
-                BuildNumericDistributionChart(kDistr, "KDistribution", "Распределение коэффициента K");
-                BuildNumericDistributionChart(bDistr, "BDistribution", "Распределение коэффициента B");
+                var dict = kDistr.Intervals.ToDictionary(x => string.Format("[{0:F0}; {1:F0})", x.LeftBorder, x.RightBorder), x => x.NumericsAmount);
+                BuildDistributionChart(dict, "KDistribution", "Распределение коэффициента K");
+
+                dict = bDistr.Intervals.ToDictionary(x => string.Format("[{0:F0}; {1:F0})", x.LeftBorder, x.RightBorder), x => x.NumericsAmount);
+                BuildDistributionChart(dict, "BDistribution", "Распределение коэффициента B");
 
                 var distr = new DoubleNumericDistribution(kDistr.LeftBorder, kDistr.RightBorder,
                 bDistr.LeftBorder, bDistr.RightBorder, 10);
