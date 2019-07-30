@@ -5,11 +5,13 @@ namespace QuizData.Analyser.Models
     public class DoubleNumericDistribution
     {
         public List<DoubleNumericDistributionPart> Parts { get; }
+        public uint IntervalsAmount { get; }
 
         public DoubleNumericDistribution(double leftBorder1, double rightBorder1,
             double leftBorder2, double rightBorder2, uint intervalsAmount)
         {
             Parts = new List<DoubleNumericDistributionPart>((int)intervalsAmount);
+            IntervalsAmount = intervalsAmount;
 
             double step1 = (rightBorder1 - leftBorder1) / intervalsAmount;
             double step2 = (rightBorder2 - leftBorder2) / intervalsAmount;

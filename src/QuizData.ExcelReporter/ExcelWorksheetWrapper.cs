@@ -105,6 +105,11 @@ namespace QuizData.ExcelReport
             to.PlaceChart(chart, height);
         }
 
+        public void Create3DChart(string chartName, string chartTitle, string[] axisTitles, int height = 20)
+        {
+            Create3DChart(chartName, chartTitle, this, axisTitles, height);
+        }
+
         public void Create3DChart(string chartName, string chartTitle, ExcelWorksheetWrapper to,
             string[] axisTitles, int height = 20)
         {

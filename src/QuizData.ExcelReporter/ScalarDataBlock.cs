@@ -2,13 +2,13 @@
 {
     public class ScalarDataBlock : IDataBlock
     {
-        private readonly object _data;
-        private readonly string _caption;
+        public object Data { get; }
+        public string Caption { get; }
 
         public ScalarDataBlock(object data, string caption)
         {
-            _data = data;
-            _caption = caption;
+            Data = data;
+            Caption = caption;
         }
     }
 }

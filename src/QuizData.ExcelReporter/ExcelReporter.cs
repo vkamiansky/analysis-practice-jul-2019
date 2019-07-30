@@ -21,30 +21,53 @@ namespace QuizData.ExcelReport
             _questions = new ExcelWorksheetWrapper(_package.Workbook.Worksheets.Add("Вопросы"));
         }
 
-        public void BuildDistributionChart<T>(IEnumerable<T> distribution, string chartName, string chartTitle)
+        #region Work with DataBlocks
+
+        public void WriteDataBlock(IDataBlock dataBlock, ExcelWorksheetWrapper to)
         {
-            _temp.SetPos1();
-
-            for (var i = 0; i < distribution.Count(); i++)
+            if (dataBlock is ScalarDataBlock scalarDataBlock)
             {
-                if (!distribution.ElementAt(i).Equals(default(T)))
-                {
-                    _temp.Write(i + 1);
-                    _temp.WriteLine(distribution.ElementAt(i));
-                }
+                WriteScalarDataBlock(scalarDataBlock, to);
             }
-
-            _temp.GoBack();
-            _temp.SetPos2();
-            _temp.WriteLine();
-            _temp.CreateChart(chartName, chartTitle, _main);
+            else if (dataBlock is DistributionDataBlock<string, uint> doubleDistributionDataBlock)
+            {
+                WriteDistributionDataBlock(doubleDistributionDataBlock, to);
+            }
+            else if (dataBlock is DistributionDataBlock<uint, uint> uintDistributionDataBlock)
+            {
+                WriteDistributionDataBlock(uintDistributionDataBlock, to);
+            }
+            else if (dataBlock is DoubleDistributionDataBlock<uint, uint> c)
+            {
+                WriteDoubleDistributionDataBlock(c, to);
+            }
+            else if (dataBlock is DoubleDistributionDataBlock<uint, double?> d)
+            {
+                WriteDoubleDistributionDataBlock(d, to);
+            }
+            else
+            {
+                throw new System.ArgumentException("DataBlock wasn't recognized");
+            }
         }
 
-        public void BuildDistributionChart<TKey, TValue>(IEnumerable<KeyValuePair<TKey, TValue>> distribution, string chartName, string chartTitle)
+        public void WriteDataBlocks(IEnumerable<IDataBlock> dataBlocks, ExcelWorksheetWrapper to)
+        {
+            foreach (var dataBlock in dataBlocks)
+                WriteDataBlock(dataBlock, to);
+        }
+
+        public void WriteScalarDataBlock(ScalarDataBlock dataBlock, ExcelWorksheetWrapper to)
+        {
+            to.Write(dataBlock.Caption);
+            to.WriteLine(dataBlock.Data);
+        }
+
+        public void WriteDistributionDataBlock<TKey, TValue>(DistributionDataBlock<TKey, TValue> db, ExcelWorksheetWrapper to)
         {
             _temp.SetPos1();
 
-            foreach (var el in distribution)
+            foreach (var el in db.Distribution)
             {
                 _temp.Write(el.Key);
                 _temp.WriteLine(el.Value);
@@ -53,156 +76,129 @@ namespace QuizData.ExcelReport
             _temp.GoBack();
             _temp.SetPos2();
             _temp.WriteLine();
-            _temp.CreateChart(chartName, chartTitle, _main);
+            _temp.CreateChart(db.ChartName, db.ChartTitle, to);
         }
 
-        public void BuildKAndBDistributionsChart(DoubleNumericDistribution distribution)
+        public void WriteDoubleDistributionDataBlock<TKey, TValue>(DoubleDistributionDataBlock<TKey, TValue> db, ExcelWorksheetWrapper to)
         {
-            _temp.Write("");
-            for (var i = 1; i < 11; i++)
-            {
-                _temp.Write(i);
-            }
-            _temp.WriteLine();
-
             _temp.SetPos1();
 
-            for (var i = 1; i < 11; i++)
+            for (var i = 0; i < db.Distribution.Count(); i++)
             {
-                _temp.Write(i);
-                for (var j = (i - 1) * 10; j < (i - 1) * 10 + 10; j++)
+                var current = db.Distribution.ElementAt(i);
+                _temp.Write(current.Key);
+                for (var j = 0; j < current.Value.Count(); j++)
                 {
-                    _temp.Write(distribution.Parts.ElementAt(j).NumericsAmount);
+                    _temp.Write(current.Value.ElementAt(j));
                 }
                 _temp.WriteLine();
             }
 
             _temp.GoBack();
             _temp.SetPos2();
-
-            _temp.Create3DChart("KnBDistribution", "Распределение по K и B",
-                _main, new[] { "K", "Количество человек", "B" });
-
             _temp.WriteLine();
+            _temp.Create3DChart(db.ChartName, db.ChartTitle, to, db.AxisTitles);
         }
 
-        public void BuildSigmaMinDistributionChart(DoubleNumericDistribution distribution)
+        #endregion
+
+        public void BuildQuestionStatistics(KeyValuePair<string, QuestionStatistics> qStatistics, List<IDataBlock> dataBlocks)
         {
-            _temp.Write("");
-            for (var i = 1; i < 11; i++)
-            {
-                _temp.Write(i);
-            }
-            _temp.WriteLine();
+            var scalarDB = new ScalarDataBlock(qStatistics.Key, "Вопрос:");
+            dataBlocks.Add(scalarDB);
 
-            _temp.SetPos1();
+            scalarDB = new ScalarDataBlock(qStatistics.Value.RightAnswersAmount, "Правильных ответов:");
+            dataBlocks.Add(scalarDB);
 
-            for (var i = 1; i < 11; i++)
+            scalarDB = new ScalarDataBlock(qStatistics.Value.WrongAnswersAmount, "Неправильных ответов:");
+            dataBlocks.Add(scalarDB);
+
+            scalarDB = new ScalarDataBlock(qStatistics.Value.RightAnswersAmount +
+                qStatistics.Value.WrongAnswersAmount, "Всего ответов:");
+            dataBlocks.Add(scalarDB);
+
+            scalarDB = new ScalarDataBlock(qStatistics.Value.RightAnswerIndex + 1, "Правильный ответ:");
+            dataBlocks.Add(scalarDB);
+
+            var distributionDB = MakeDistributionDataBlock(
+                qStatistics.Value.AnswersDistribution,
+                "QuestionStatistics-" + qStatistics.Key.GetHashCode(),
+                "Ответы пользователей");
+            dataBlocks.Add(distributionDB);
+
+            scalarDB = new ScalarDataBlock("", "");
+            dataBlocks.Add(scalarDB);
+        }
+
+        public DistributionDataBlock<uint, uint> MakeDistributionDataBlock
+            (IEnumerable<uint> data, string chartName, string chartTitle)
+        {
+            var i = 1U;
+            var dictionary = data.ToDictionary(x => i++, x => x);
+            return new DistributionDataBlock<uint, uint>(dictionary, chartName, chartTitle);
+        }
+
+        public DistributionDataBlock<string, uint> MakeDistributionDataBlock
+            (NumericDistribution distribution, string chartName, string chartTitle)
+        {
+            var dictionary = distribution.Intervals.ToDictionary(
+                x => string.Format("[{0:F0}; {1:F0})", x.LeftBorder, x.RightBorder),
+                x => x.NumericsAmount);
+            return new DistributionDataBlock<string, uint>(dictionary, chartName, chartTitle);
+        }
+
+        public DoubleDistributionDataBlock<uint, TValue> MakeDoubleDistributionDataBlock<TValue>
+            (IEnumerable<TValue> data, uint IntervalsAmount, string chartName, string chartTitle, string[] axisTitles)
+        {
+            var list = new List<KeyValuePair<uint, IEnumerable<TValue>>>();
+            for (var j = 0U; j < IntervalsAmount; j++)
             {
-                _temp.Write(i);
-                for (var j = (i - 1) * 10; j < (i - 1) * 10 + 10; j++)
+                var innerList = new List<TValue>((int)IntervalsAmount);
+                for (var k = j * IntervalsAmount; k < (j + 1) * IntervalsAmount; k++)
                 {
-                    _temp.Write(distribution.Parts.ElementAt(j).SigmaMin);
+                    innerList.Add(data.ElementAt((int)k));
                 }
-                _temp.WriteLine();
+                list.Add(new KeyValuePair<uint, IEnumerable<TValue>>(j, innerList));
             }
-
-            _temp.GoBack();
-            _temp.SetPos2();
-
-            _temp.Create3DChart("SigmaMinDistribution", "Распределение по K и B SigmaMin",
-                _main, new[] { "K", "SigmaMin", "B" });
-
-            _temp.WriteLine();
-        }
-
-        public void BuildSigmaMaxDistributionChart(DoubleNumericDistribution distribution)
-        {
-            _temp.Write("");
-            for (var i = 1; i < 11; i++)
-            {
-                _temp.Write(i);
-            }
-            _temp.WriteLine();
-
-            _temp.SetPos1();
-
-            for (var i = 1; i < 11; i++)
-            {
-                _temp.Write(i);
-                for (var j = (i - 1) * 10; j < (i - 1) * 10 + 10; j++)
-                {
-                    _temp.Write(distribution.Parts.ElementAt(j).SigmaMax);
-                }
-                _temp.WriteLine();
-            }
-
-            _temp.GoBack();
-            _temp.SetPos2();
-
-            _temp.Create3DChart("SigmaMaxDistribution", "Распределение по K и B SigmaMax",
-                _main, new[] { "K", "SigmaMax", "B" });
-
-            _temp.WriteLine();
-        }
-
-        public void BuildQuestionStatistics(KeyValuePair<string, QuestionStatistics> qStatistics)
-        {
-            _questions.WriteLine(qStatistics.Key);
-
-            _questions.Write("Правильных ответов:");
-            _questions.WriteLine(qStatistics.Value.RightAnswersAmount);
-
-            _questions.Write("Неправильных ответов:");
-            _questions.WriteLine(qStatistics.Value.WrongAnswersAmount);
-
-            _questions.Write("Всего ответов:");
-            _questions.WriteLine(qStatistics.Value.RightAnswersAmount +
-                qStatistics.Value.WrongAnswersAmount);
-
-            _questions.Write("Правильный ответ:");
-            _questions.WriteLine(qStatistics.Value.RightAnswerIndex + 1);
-
-            _temp.SetPos1();
-
-            for (var i = 0; i < qStatistics.Value.AnswersDistribution.Length; i++)
-            {
-                _temp.Write(i + 1);
-                _temp.WriteLine(qStatistics.Value.AnswersDistribution[i]);
-            }
-
-            _temp.GoBack();
-            _temp.SetPos2();
-            _temp.WriteLine();
-            _temp.CreateChart("QuestionStatistics-" + qStatistics.Key.GetHashCode(),
-                "Ответы пользователей", _questions);
-            _questions.WriteLine();
+            return new DoubleDistributionDataBlock<uint, TValue>(list, chartName, chartTitle, axisTitles);
         }
 
         public void ToStream(Stream stream, DataAnalyserReport report)
         {
-            _main.Write("Всего тестов:");
-            _main.WriteLine(report.TotalAmountOfTests);
+            var mainDataBlocks = new List<IDataBlock>();
 
-            _main.Write("Количество уникальных e-mail'ов:");
-            _main.WriteLine(report.AmountOfUniqueEmails);
+            var scalarDB = new ScalarDataBlock(report.TotalAmountOfTests, "Всего тестов:");
+            mainDataBlocks.Add(scalarDB);
 
-            BuildDistributionChart(report.AttemptDistribution, "AttemptDistribution", "Распределение попыток");
+            scalarDB = new ScalarDataBlock(report.AmountOfUniqueEmails,
+                "Количество уникальных e-mail'ов:");
+            mainDataBlocks.Add(scalarDB);
 
-            var list = report.ResultDistribution.ToList();
-            list.Sort((pair1, pair2) => pair1.Key.CompareTo(pair2.Key));
+            var i = 0U;
+            var attemptDistribution = report.AttemptDistribution
+                .ToDictionary(x => ++i, x => x)
+                .Where(x => x.Value != 0);
 
-            BuildDistributionChart(list, "ResultDistribution", "Распределение результатов");
+            var distributionDataBlock = new DistributionDataBlock<uint, uint>(attemptDistribution,
+                "AttemptDistribution", "Распределение попыток");
+            mainDataBlocks.Add(distributionDataBlock);
+
+            var resultDistribution = report.ResultDistribution.ToList();
+            resultDistribution.Sort((pair1, pair2) => pair1.Key.CompareTo(pair2.Key));
+
+            distributionDataBlock = new DistributionDataBlock<uint, uint>(resultDistribution,
+                "ResultDistribution", "Распределение результатов");
+            mainDataBlocks.Add(distributionDataBlock);
 
             (var kDistr, var bDistr) = report.GetAdditionalInfo();
 
             if (kDistr != null && bDistr != null)
             {
-                var dict = kDistr.Intervals.ToDictionary(x => string.Format("[{0:F0}; {1:F0})", x.LeftBorder, x.RightBorder), x => x.NumericsAmount);
-                BuildDistributionChart(dict, "KDistribution", "Распределение коэффициента K");
+                mainDataBlocks.Add(
+                    MakeDistributionDataBlock(kDistr, "KDistribution", "Распределение коэффициента K"));
 
-                dict = bDistr.Intervals.ToDictionary(x => string.Format("[{0:F0}; {1:F0})", x.LeftBorder, x.RightBorder), x => x.NumericsAmount);
-                BuildDistributionChart(dict, "BDistribution", "Распределение коэффициента B");
+                mainDataBlocks.Add(
+                    MakeDistributionDataBlock(bDistr, "BDistribution", "Распределение коэффициента B"));
 
                 var distr = new DoubleNumericDistribution(kDistr.LeftBorder, kDistr.RightBorder,
                 bDistr.LeftBorder, bDistr.RightBorder, 10);
@@ -217,13 +213,27 @@ namespace QuizData.ExcelReport
                     }
                 }
 
-                BuildKAndBDistributionsChart(distr);
-                BuildSigmaMinDistributionChart(distr);
-                BuildSigmaMaxDistributionChart(distr);
+                mainDataBlocks.Add(MakeDoubleDistributionDataBlock(
+                    distr.Parts.Select(x => x.NumericsAmount), distr.IntervalsAmount,
+                    "KnBDistribution", "Распределение по K и B",
+                    new[] { "K", "Количество человек", "B" }));
+                mainDataBlocks.Add(MakeDoubleDistributionDataBlock(
+                    distr.Parts.Select(x => x.SigmaMin), distr.IntervalsAmount,
+                    "SigmaMinDistribution", "Распределение по K и B SigmaMin",
+                    new[] { "K", "Количество человек", "B" }));
+                mainDataBlocks.Add(MakeDoubleDistributionDataBlock(
+                    distr.Parts.Select(x => x.SigmaMax), distr.IntervalsAmount,
+                    "SigmaMaxDistribution", "Распределение по K и B SigmaMax",
+                    new[] { "K", "SigmaMax", "B" }));
             }
 
+            var questionsDataBlocks = new List<IDataBlock>();
+
             foreach (var el in report.QuestionStatistics)
-                BuildQuestionStatistics(el);
+                BuildQuestionStatistics(el, questionsDataBlocks);
+
+            WriteDataBlocks(mainDataBlocks, _main);
+            WriteDataBlocks(questionsDataBlocks, _questions);
 
             _package.SaveAs(stream);
         }
