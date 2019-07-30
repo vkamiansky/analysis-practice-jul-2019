@@ -102,7 +102,7 @@ namespace QuizData.ExcelReport
 
         #endregion
 
-        public void BuildQuestionStatistics(KeyValuePair<string, QuestionStatistics> qStatistics, List<IDataBlock> dataBlocks)
+        public void BuildQuestionStatistics(List<IDataBlock> dataBlocks, KeyValuePair<string, QuestionStatistics> qStatistics)
         {
             var scalarDB = new ScalarDataBlock(qStatistics.Key, "Вопрос:");
             dataBlocks.Add(scalarDB);
@@ -230,7 +230,7 @@ namespace QuizData.ExcelReport
             var questionsDataBlocks = new List<IDataBlock>();
 
             foreach (var el in report.QuestionStatistics)
-                BuildQuestionStatistics(el, questionsDataBlocks);
+                BuildQuestionStatistics(questionsDataBlocks, el);
 
             WriteDataBlocks(mainDataBlocks, _main);
             WriteDataBlocks(questionsDataBlocks, _questions);
