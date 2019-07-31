@@ -214,15 +214,15 @@ namespace QuizData.ExcelReport
                 }
 
                 mainDataBlocks.Add(MakeDoubleDistributionDataBlock(
-                    distr.Parts.Select(x => x.NumericsAmount), distr.IntervalsAmount,
+                    distr.Parts.Select(x => x.NumericsAmount), distr.IntervalsNumber,
                     "KnBDistribution", "Распределение по K и B",
                     new[] { "K", "Количество человек", "B" }));
                 mainDataBlocks.Add(MakeDoubleDistributionDataBlock(
-                    distr.Parts.Select(x => x.SigmaMin), distr.IntervalsAmount,
+                    distr.Parts.Select(x => x.SigmaMin), distr.IntervalsNumber,
                     "SigmaMinDistribution", "Распределение по K и B SigmaMin",
                     new[] { "K", "Количество человек", "B" }));
                 mainDataBlocks.Add(MakeDoubleDistributionDataBlock(
-                    distr.Parts.Select(x => x.SigmaMax), distr.IntervalsAmount,
+                    distr.Parts.Select(x => x.SigmaMax), distr.IntervalsNumber,
                     "SigmaMaxDistribution", "Распределение по K и B SigmaMax",
                     new[] { "K", "SigmaMax", "B" }));
             }
