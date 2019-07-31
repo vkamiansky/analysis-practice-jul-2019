@@ -67,7 +67,7 @@ namespace QuizData.ExcelReport
         {
             _temp.SetPos1();
 
-            foreach (var el in db.Distribution)
+            foreach (var el in db.Data)
             {
                 _temp.Write(el.Key);
                 _temp.WriteLine(el.Value);
@@ -76,7 +76,10 @@ namespace QuizData.ExcelReport
             _temp.GoBack();
             _temp.SetPos2();
             _temp.WriteLine();
-            _temp.CreateChart(db.ChartName, db.ChartTitle, to);
+
+            var chartTitle = string.IsNullOrEmpty(db.Title) ? "" : db.Title;
+            var chartName = chartTitle + System.Guid.NewGuid();
+            _temp.CreateChart(chartName, chartTitle, to);
         }
 
         public void WriteDoubleDistributionDataBlock<TKey, TValue>(DoubleDistributionDataBlock<TKey, TValue> db, ExcelWorksheetWrapper to)
@@ -122,7 +125,6 @@ namespace QuizData.ExcelReport
 
             var distributionDB = MakeDistributionDataBlock(
                 qStatistics.Value.AnswersDistribution,
-                "QuestionStatistics-" + qStatistics.Key.GetHashCode(),
                 "Ответы пользователей");
             dataBlocks.Add(distributionDB);
 
@@ -131,20 +133,20 @@ namespace QuizData.ExcelReport
         }
 
         public DistributionDataBlock<uint, uint> MakeDistributionDataBlock
-            (IEnumerable<uint> data, string chartName, string chartTitle)
+            (IEnumerable<uint> data, string chartTitle)
         {
             var i = 1U;
             var dictionary = data.ToDictionary(x => i++, x => x);
-            return new DistributionDataBlock<uint, uint>(dictionary, chartName, chartTitle);
+            return new DistributionDataBlock<uint, uint>(dictionary, chartTitle);
         }
 
         public DistributionDataBlock<string, uint> MakeDistributionDataBlock
-            (NumericDistribution distribution, string chartName, string chartTitle)
+            (NumericDistribution distribution, string chartTitle)
         {
             var dictionary = distribution.Intervals.ToDictionary(
                 x => string.Format("[{0:F0}; {1:F0})", x.LeftBorder, x.RightBorder),
                 x => x.NumericsAmount);
-            return new DistributionDataBlock<string, uint>(dictionary, chartName, chartTitle);
+            return new DistributionDataBlock<string, uint>(dictionary, chartTitle);
         }
 
         public DoubleDistributionDataBlock<uint, TValue> MakeDoubleDistributionDataBlock<TValue>
@@ -180,14 +182,14 @@ namespace QuizData.ExcelReport
                 .Where(x => x.Value != 0);
 
             var distributionDataBlock = new DistributionDataBlock<uint, uint>(attemptDistribution,
-                "AttemptDistribution", "Распределение попыток");
+                "Распределение попыток");
             mainDataBlocks.Add(distributionDataBlock);
 
             var resultDistribution = report.ResultDistribution.ToList();
             resultDistribution.Sort((pair1, pair2) => pair1.Key.CompareTo(pair2.Key));
 
             distributionDataBlock = new DistributionDataBlock<uint, uint>(resultDistribution,
-                "ResultDistribution", "Распределение результатов");
+                "Распределение результатов");
             mainDataBlocks.Add(distributionDataBlock);
 
             (var kDistr, var bDistr) = report.GetAdditionalInfo();
@@ -195,10 +197,10 @@ namespace QuizData.ExcelReport
             if (kDistr != null && bDistr != null)
             {
                 mainDataBlocks.Add(
-                    MakeDistributionDataBlock(kDistr, "KDistribution", "Распределение коэффициента K"));
+                    MakeDistributionDataBlock(kDistr, "Распределение коэффициента K"));
 
                 mainDataBlocks.Add(
-                    MakeDistributionDataBlock(bDistr, "BDistribution", "Распределение коэффициента B"));
+                    MakeDistributionDataBlock(bDistr, "Распределение коэффициента B"));
 
                 var distr = new DoubleNumericDistribution(kDistr.LeftBorder, kDistr.RightBorder,
                 bDistr.LeftBorder, bDistr.RightBorder, 10);
