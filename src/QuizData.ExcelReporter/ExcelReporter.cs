@@ -1,8 +1,8 @@
 ﻿using System.IO;
 using System.Linq;
 using OfficeOpenXml;
-using QuizData.Analyser.Models;
 using System.Collections.Generic;
+using QuizData.Analyser.Models.DataBlocks;
 
 namespace QuizData.ExcelReport
 {
@@ -20,8 +20,6 @@ namespace QuizData.ExcelReport
             _main = new ExcelWorksheetWrapper(_package.Workbook.Worksheets.Add("Главная"));
             _questions = new ExcelWorksheetWrapper(_package.Workbook.Worksheets.Add("Вопросы"));
         }
-
-        #region Work with DataBlocks
 
         public void WriteDataBlock(IDataBlock dataBlock, ExcelWorksheetWrapper to)
         {
@@ -106,142 +104,10 @@ namespace QuizData.ExcelReport
                 new[] { db.Interval1ValueTitle, db.Interval2ValueTitle, db.MeasuredValueTitle });
         }
 
-        #endregion
-
-        public void BuildQuestionStatistics(List<IDataBlock> dataBlocks, KeyValuePair<string, QuestionStatistics> qStatistics)
+        public void ToStream(Stream stream, IEnumerable<IDataBlock> mainData, IEnumerable<IDataBlock> questionsData)
         {
-            var scalarDB = new ScalarDataBlock(qStatistics.Key, "Вопрос:");
-            dataBlocks.Add(scalarDB);
-
-            scalarDB = new ScalarDataBlock(qStatistics.Value.RightAnswersAmount, "Правильных ответов:");
-            dataBlocks.Add(scalarDB);
-
-            scalarDB = new ScalarDataBlock(qStatistics.Value.WrongAnswersAmount, "Неправильных ответов:");
-            dataBlocks.Add(scalarDB);
-
-            scalarDB = new ScalarDataBlock(qStatistics.Value.RightAnswersAmount +
-                qStatistics.Value.WrongAnswersAmount, "Всего ответов:");
-            dataBlocks.Add(scalarDB);
-
-            scalarDB = new ScalarDataBlock(qStatistics.Value.RightAnswerIndex + 1, "Правильный ответ:");
-            dataBlocks.Add(scalarDB);
-
-            var distributionDB = MakeDistributionDataBlock(
-                qStatistics.Value.AnswersDistribution,
-                "Ответы пользователей");
-            dataBlocks.Add(distributionDB);
-
-            scalarDB = new ScalarDataBlock("", "");
-            dataBlocks.Add(scalarDB);
-        }
-
-        public DistributionDataBlock<uint, uint> MakeDistributionDataBlock
-            (IEnumerable<uint> data, string chartTitle)
-        {
-            var i = 1U;
-            var dictionary = data.ToDictionary(x => i++, x => x);
-            return new DistributionDataBlock<uint, uint>(dictionary, chartTitle);
-        }
-
-        public DistributionDataBlock<string, uint> MakeDistributionDataBlock
-            (NumericDistribution distribution, string chartTitle)
-        {
-            var dictionary = distribution.Intervals.ToDictionary(
-                x => string.Format("[{0:F0}; {1:F0})", x.LeftBorder, x.RightBorder),
-                x => x.NumericsAmount);
-            return new DistributionDataBlock<string, uint>(dictionary, chartTitle);
-        }
-
-        public DoubleDistributionDataBlock<uint, TValue> MakeDoubleDistributionDataBlock<TValue>
-            (IEnumerable<TValue> data, uint IntervalsAmount, string chartTitle, string[] axisTitles)
-        {
-            var list = new List<KeyValuePair<uint, IEnumerable<TValue>>>();
-            for (var j = 0U; j < IntervalsAmount; j++)
-            {
-                var innerList = new List<TValue>((int)IntervalsAmount);
-                for (var k = j * IntervalsAmount; k < (j + 1) * IntervalsAmount; k++)
-                {
-                    innerList.Add(data.ElementAt((int)k));
-                }
-                list.Add(new KeyValuePair<uint, IEnumerable<TValue>>(j, innerList));
-            }
-            return new DoubleDistributionDataBlock<uint, TValue>(list, chartTitle,
-                axisTitles[0], null,
-                axisTitles[1], null,
-                axisTitles[2], null);
-        }
-
-        public void ToStream(Stream stream, DataAnalyserReport report)
-        {
-            var mainDataBlocks = new List<IDataBlock>();
-
-            var scalarDB = new ScalarDataBlock(report.TotalAmountOfTests, "Всего тестов:");
-            mainDataBlocks.Add(scalarDB);
-
-            scalarDB = new ScalarDataBlock(report.AmountOfUniqueEmails,
-                "Количество уникальных e-mail'ов:");
-            mainDataBlocks.Add(scalarDB);
-
-            var i = 0U;
-            var attemptDistribution = report.AttemptDistribution
-                .ToDictionary(x => ++i, x => x)
-                .Where(x => x.Value != 0);
-
-            var distributionDataBlock = new DistributionDataBlock<uint, uint>(attemptDistribution,
-                "Распределение попыток");
-            mainDataBlocks.Add(distributionDataBlock);
-
-            var resultDistribution = report.ResultDistribution.ToList();
-            resultDistribution.Sort((pair1, pair2) => pair1.Key.CompareTo(pair2.Key));
-
-            distributionDataBlock = new DistributionDataBlock<uint, uint>(resultDistribution,
-                "Распределение результатов");
-            mainDataBlocks.Add(distributionDataBlock);
-
-            (var kDistr, var bDistr) = report.GetAdditionalInfo();
-
-            if (kDistr != null && bDistr != null)
-            {
-                mainDataBlocks.Add(
-                    MakeDistributionDataBlock(kDistr, "Распределение коэффициента K"));
-
-                mainDataBlocks.Add(
-                    MakeDistributionDataBlock(bDistr, "Распределение коэффициента B"));
-
-                var distr = new DoubleNumericDistribution(kDistr.LeftBorder, kDistr.RightBorder,
-                bDistr.LeftBorder, bDistr.RightBorder, 10);
-
-                foreach (var el in report.PersonStatistics)
-                {
-                    if (el.Value.AdditionalInfo != null)
-                    {
-                        distr.AddNumerics(el.Value.AdditionalInfo.Value.K,
-                            el.Value.AdditionalInfo.Value.B,
-                            el.Value.AdditionalInfo.Value.R);
-                    }
-                }
-
-                mainDataBlocks.Add(MakeDoubleDistributionDataBlock(
-                    distr.Parts.Select(x => x.NumericsAmount), distr.IntervalsNumber,
-                    "Распределение по K и B",
-                    new[] { "K", "Количество человек", "B" }));
-                mainDataBlocks.Add(MakeDoubleDistributionDataBlock(
-                    distr.Parts.Select(x => x.SigmaMin), distr.IntervalsNumber,
-                    "Распределение по K и B SigmaMin",
-                    new[] { "K", "SigmaMin", "B" }));
-                mainDataBlocks.Add(MakeDoubleDistributionDataBlock(
-                    distr.Parts.Select(x => x.SigmaMax), distr.IntervalsNumber,
-                    "Распределение по K и B SigmaMax",
-                    new[] { "K", "SigmaMax", "B" }));
-            }
-
-            var questionsDataBlocks = new List<IDataBlock>();
-
-            foreach (var el in report.QuestionStatistics)
-                BuildQuestionStatistics(questionsDataBlocks, el);
-
-            WriteDataBlocks(mainDataBlocks, _main);
-            WriteDataBlocks(questionsDataBlocks, _questions);
+            WriteDataBlocks(mainData, _main);
+            WriteDataBlocks(questionsData, _questions);
 
             _package.SaveAs(stream);
         }

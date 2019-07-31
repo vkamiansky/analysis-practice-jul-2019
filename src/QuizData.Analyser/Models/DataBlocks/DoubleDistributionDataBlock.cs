@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace QuizData.ExcelReport
+namespace QuizData.Analyser.Models.DataBlocks
 {
     public class DoubleDistributionDataBlock<TKey, TValue> : IDataBlock
     {

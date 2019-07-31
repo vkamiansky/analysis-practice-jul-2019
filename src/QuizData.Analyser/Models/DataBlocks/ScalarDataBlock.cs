@@ -1,4 +1,4 @@
-﻿namespace QuizData.ExcelReport
+﻿namespace QuizData.Analyser.Models.DataBlocks
 {
     public class ScalarDataBlock : IDataBlock
     {
