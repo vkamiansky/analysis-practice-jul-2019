@@ -37,7 +37,7 @@ namespace QuizData
             var questionsData = report.GetQuestionsData();
             using (var stream = new FileStream("report.txt", FileMode.Create))
             {
-                TextReporter.ToStream(stream, report);
+                TextReporter.ToStream(stream, mainData, questionsData);
             }
             var reporter = new ExcelReport.ExcelReporter();
             using (var stream = new FileStream("report.xlsx", FileMode.Create))
