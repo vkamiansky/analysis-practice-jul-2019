@@ -86,9 +86,9 @@ namespace QuizData.ExcelReport
         {
             _temp.SetPos1();
 
-            for (var i = 0; i < db.Distribution.Count(); i++)
+            for (var i = 0; i < db.Data.Count(); i++)
             {
-                var current = db.Distribution.ElementAt(i);
+                var current = db.Data.ElementAt(i);
                 _temp.Write(current.Key);
                 for (var j = 0; j < current.Value.Count(); j++)
                 {
@@ -100,7 +100,10 @@ namespace QuizData.ExcelReport
             _temp.GoBack();
             _temp.SetPos2();
             _temp.WriteLine();
-            _temp.Create3DChart(db.ChartName, db.ChartTitle, to, db.AxisTitles);
+            var chartTitle = string.IsNullOrEmpty(db.Title) ? "" : db.Title;
+            var chartName = chartTitle + System.Guid.NewGuid();
+            _temp.Create3DChart(chartName, chartTitle, to,
+                new[] { db.Interval1ValueTitle, db.Interval2ValueTitle, db.MeasuredValueTitle });
         }
 
         #endregion
@@ -150,7 +153,7 @@ namespace QuizData.ExcelReport
         }
 
         public DoubleDistributionDataBlock<uint, TValue> MakeDoubleDistributionDataBlock<TValue>
-            (IEnumerable<TValue> data, uint IntervalsAmount, string chartName, string chartTitle, string[] axisTitles)
+            (IEnumerable<TValue> data, uint IntervalsAmount, string chartTitle, string[] axisTitles)
         {
             var list = new List<KeyValuePair<uint, IEnumerable<TValue>>>();
             for (var j = 0U; j < IntervalsAmount; j++)
@@ -162,7 +165,10 @@ namespace QuizData.ExcelReport
                 }
                 list.Add(new KeyValuePair<uint, IEnumerable<TValue>>(j, innerList));
             }
-            return new DoubleDistributionDataBlock<uint, TValue>(list, chartName, chartTitle, axisTitles);
+            return new DoubleDistributionDataBlock<uint, TValue>(list, chartTitle,
+                axisTitles[0], null,
+                axisTitles[1], null,
+                axisTitles[2], null);
         }
 
         public void ToStream(Stream stream, DataAnalyserReport report)
@@ -217,15 +223,15 @@ namespace QuizData.ExcelReport
 
                 mainDataBlocks.Add(MakeDoubleDistributionDataBlock(
                     distr.Parts.Select(x => x.NumericsAmount), distr.IntervalsNumber,
-                    "KnBDistribution", "Распределение по K и B",
+                    "Распределение по K и B",
                     new[] { "K", "Количество человек", "B" }));
                 mainDataBlocks.Add(MakeDoubleDistributionDataBlock(
                     distr.Parts.Select(x => x.SigmaMin), distr.IntervalsNumber,
-                    "SigmaMinDistribution", "Распределение по K и B SigmaMin",
-                    new[] { "K", "Количество человек", "B" }));
+                    "Распределение по K и B SigmaMin",
+                    new[] { "K", "SigmaMin", "B" }));
                 mainDataBlocks.Add(MakeDoubleDistributionDataBlock(
                     distr.Parts.Select(x => x.SigmaMax), distr.IntervalsNumber,
-                    "SigmaMaxDistribution", "Распределение по K и B SigmaMax",
+                    "Распределение по K и B SigmaMax",
                     new[] { "K", "SigmaMax", "B" }));
             }
 
