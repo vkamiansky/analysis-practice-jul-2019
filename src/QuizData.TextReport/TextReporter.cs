@@ -58,11 +58,24 @@ namespace QuizData.TextReport
             writer.WriteLine();
             writer.Write(db.Title);
             writer.WriteLine(":");
-            foreach (var el in db.Data)
+
+            // Write signatures
+            foreach (var pair in db.Data[0])
             {
-                writer.Write(el.Key);
-                writer.Write(": ");
-                writer.WriteLine(el.Value);
+                writer.Write(pair.Key);
+                writer.Write(' ');
+            }
+            writer.WriteLine();
+
+            // Write all distribution data
+            foreach (var dataRow in db.Data)
+            {
+                foreach (var pair in dataRow)
+                {
+                    writer.Write(pair.Value);
+                    writer.Write(' ');
+                }
+                writer.WriteLine();
             }
         }
 

@@ -3,6 +3,7 @@ using System.Linq;
 using OfficeOpenXml;
 using System.Collections.Generic;
 using QuizData.Analyser.Models.DataBlocks;
+using OfficeOpenXml.Drawing.Chart;
 
 namespace QuizData.ExcelReport
 {
@@ -63,21 +64,47 @@ namespace QuizData.ExcelReport
 
         public void WriteDistributionDataBlock<TKey, TValue>(DistributionDataBlock<TKey, TValue> db, ExcelWorksheetWrapper to)
         {
-            _temp.SetPos1();
+            _temp.WriteLine(db.Title);
 
-            foreach (var el in db.Data)
+            var signatureRange = _temp.StartRangeHere();
+            foreach (var pair in db.Data.First())
             {
-                _temp.Write(el.Key);
-                _temp.WriteLine(el.Value);
+                _temp.Write(pair.Key);
             }
-
             _temp.GoBack();
-            _temp.SetPos2();
+            _temp.FinishRangeHere(signatureRange);
+
             _temp.WriteLine();
 
-            var chartTitle = string.IsNullOrEmpty(db.Title) ? "" : db.Title;
-            var chartName = chartTitle + System.Guid.NewGuid();
-            _temp.CreateChart(chartName, chartTitle, to);
+            var dataRanges = new List<ExcelRange>(db.Data.Count());
+
+            foreach (var dataRow in db.Data)
+            {
+                var dataRange = _temp.StartRangeHere();
+                foreach (var pair in dataRow)
+                {
+                    _temp.Write(pair.Value);
+                }
+                _temp.GoBack();
+                _temp.FinishRangeHere(dataRange);
+                dataRanges.Add(dataRange);
+
+                _temp.WriteLine();
+            }
+
+            _temp.CreateChart(db.Title, to, 10, signatureRange, dataRanges);
+
+            if (db.Data.Length > 1)
+            {
+                foreach (eChartType chartType in System.Enum.GetValues(typeof(eChartType)))
+                {
+                    if (chartType.ToString().Contains("Column") && chartType != eChartType.Column3D)
+                    {
+                        _temp.WriteLine(chartType.ToString());
+                        _temp.CreateChart(db.Title, to, 10, signatureRange, dataRanges, chartType);
+                    }
+                }
+            }
         }
 
         public void WriteDoubleDistributionDataBlock<TKey, TValue>(DoubleDistributionDataBlock<TKey, TValue> db, ExcelWorksheetWrapper to)

@@ -8,39 +8,51 @@ namespace QuizData.Analyser
     public static class DataTransformer
     {
         public static DistributionDataBlock<uint, TValue> MakeDistributionDataBlock<TValue>
-            (IEnumerable<TValue> data, string chartTitle)
+            (string title, IEnumerable<TValue> data)
         {
             var i = 1U;
             var dictionary = data.ToDictionary(x => i++, x => x);
-            return new DistributionDataBlock<uint, TValue>(dictionary, chartTitle);
+            return new DistributionDataBlock<uint, TValue>
+                (new IEnumerable<KeyValuePair<uint, TValue>>[] { dictionary }, title);
         }
 
         public static DistributionDataBlock<string, uint> MakeDistributionDataBlock
-            (NumericDistribution distribution, string chartTitle)
+            (string title, NumericDistribution[] distributions)
         {
-            var dictionary = distribution.Intervals.ToDictionary(
-                x => string.Format("[{0:F0}; {1:F0})", x.LeftBorder, x.RightBorder),
-                x => x.NumericsAmount);
-            return new DistributionDataBlock<string, uint>(dictionary, chartTitle);
+            var data = new Dictionary<string, uint>[distributions.Length];
+            for (var i = 0; i < distributions.Length; i++)
+            {
+                data[i] = distributions[i].Intervals.ToDictionary(
+                    x => string.Format("[{0:F0}; {1:F0})", x.LeftBorder, x.RightBorder),
+                    x => x.NumericsAmount);
+            }
+            return new DistributionDataBlock<string, uint>(data, title);
+        }
+
+        public static DistributionDataBlock<string, uint> MakeDistributionDataBlock
+            (string title, NumericDistribution distribution)
+        {
+            return MakeDistributionDataBlock(title, new[] { distribution });
         }
 
         public static DoubleDistributionDataBlock<uint, TValue> MakeDoubleDistributionDataBlock<TValue>
-            (IEnumerable<TValue> data, uint IntervalsNumber, string chartTitle, string[] axisTitles)
+            (string title, IEnumerable<TValue> data, uint intervalsNumber, string interval1ValueTitle,
+            string interval2ValueTitle, string measuredValueTitle)
         {
             var list = new List<KeyValuePair<uint, IEnumerable<TValue>>>();
-            for (var j = 0U; j < IntervalsNumber; j++)
+            for (var j = 0U; j < intervalsNumber; j++)
             {
-                var innerList = new List<TValue>((int)IntervalsNumber);
-                for (var k = j * IntervalsNumber; k < (j + 1) * IntervalsNumber; k++)
+                var innerList = new List<TValue>((int)intervalsNumber);
+                for (var k = j * intervalsNumber; k < (j + 1) * intervalsNumber; k++)
                 {
                     innerList.Add(data.ElementAt((int)k));
                 }
                 list.Add(new KeyValuePair<uint, IEnumerable<TValue>>(j, innerList));
             }
-            return new DoubleDistributionDataBlock<uint, TValue>(list, chartTitle,
-                axisTitles[0], null,
-                axisTitles[1], null,
-                axisTitles[2], null);
+            return new DoubleDistributionDataBlock<uint, TValue>(list, title,
+                interval1ValueTitle, null,
+                interval2ValueTitle, null,
+                measuredValueTitle, null);
         }
 
         public static IEnumerable<IDataBlock> GetMainData(this DataAnalyserReport report)
@@ -59,14 +71,16 @@ namespace QuizData.Analyser
                 .ToDictionary(x => ++i, x => x)
                 .Where(x => x.Value != 0);
 
-            var distributionDataBlock = new DistributionDataBlock<uint, uint>(attemptDistribution,
+            var distributionDataBlock = new DistributionDataBlock<uint, uint>
+                (new IEnumerable<KeyValuePair<uint, uint>>[] { attemptDistribution },
                 "Распределение попыток");
             data.Add(distributionDataBlock);
 
             var resultDistribution = report.ResultDistribution.ToList();
             resultDistribution.Sort((pair1, pair2) => pair1.Key.CompareTo(pair2.Key));
 
-            distributionDataBlock = new DistributionDataBlock<uint, uint>(resultDistribution,
+            distributionDataBlock = new DistributionDataBlock<uint, uint>
+                (new IEnumerable<KeyValuePair<uint, uint>>[] { resultDistribution },
                 "Распределение результатов");
             data.Add(distributionDataBlock);
 
@@ -75,10 +89,14 @@ namespace QuizData.Analyser
             if (kDistr != null && bDistr != null)
             {
                 data.Add(
-                    MakeDistributionDataBlock(kDistr, "Распределение коэффициента K"));
+                    MakeDistributionDataBlock("Распределение коэффициента K", kDistr));
 
                 data.Add(
-                    MakeDistributionDataBlock(bDistr, "Распределение коэффициента B"));
+                    MakeDistributionDataBlock("Распределение коэффициента B", bDistr));
+
+                data.Add(
+                    MakeDistributionDataBlock("Распределение K и B на одной диаграмме",
+                    new[] { kDistr, bDistr }));
 
                 var distr = new DoubleNumericDistribution(kDistr.LeftBorder, kDistr.RightBorder,
                 bDistr.LeftBorder, bDistr.RightBorder, 10);
@@ -94,17 +112,17 @@ namespace QuizData.Analyser
                 }
 
                 data.Add(MakeDoubleDistributionDataBlock(
-                    distr.Parts.Select(x => x.NumericsAmount), distr.IntervalsNumber,
                     "Распределение по K и B",
-                    new[] { "K", "Количество человек", "B" }));
+                    distr.Parts.Select(x => x.NumericsAmount), distr.IntervalsNumber,
+                    "K", "Количество человек", "B" ));
                 data.Add(MakeDoubleDistributionDataBlock(
-                    distr.Parts.Select(x => x.SigmaMin), distr.IntervalsNumber,
                     "Распределение по K и B SigmaMin",
-                    new[] { "K", "SigmaMin", "B" }));
+                    distr.Parts.Select(x => x.SigmaMin), distr.IntervalsNumber,
+                    "K", "SigmaMin", "B" ));
                 data.Add(MakeDoubleDistributionDataBlock(
-                    distr.Parts.Select(x => x.SigmaMax), distr.IntervalsNumber,
                     "Распределение по K и B SigmaMax",
-                    new[] { "K", "SigmaMax", "B" }));
+                    distr.Parts.Select(x => x.SigmaMax), distr.IntervalsNumber,
+                    "K", "SigmaMax", "B" ));
             }
 
             return data;
@@ -133,8 +151,7 @@ namespace QuizData.Analyser
                 data.Add(scalarDB);
 
                 var distributionDB = MakeDistributionDataBlock(
-                    el.Value.AnswersDistribution,
-                    "Ответы пользователей");
+                    "Ответы пользователей", el.Value.AnswersDistribution);
                 data.Add(distributionDB);
 
                 scalarDB = new ScalarDataBlock("", "");

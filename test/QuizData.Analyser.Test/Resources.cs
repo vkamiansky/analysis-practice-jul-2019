@@ -174,16 +174,22 @@ namespace QuizData.Analyser.Test
             new ScalarDataBlock(1U, "Всего тестов:"),
             new ScalarDataBlock(1U, "Количество уникальных e-mail'ов:"),
             new DistributionDataBlock<uint, uint>(
-                new List<KeyValuePair<uint, uint>>()
+                new[]
                 {
-                    new KeyValuePair<uint, uint>(1, 1)
+                    new List<KeyValuePair<uint, uint>>()
+                    {
+                        new KeyValuePair<uint, uint>(1, 1)
+                    }
                 },
                 "Распределение попыток"
             ),
             new DistributionDataBlock<uint, uint>(
-                new List<KeyValuePair<uint, uint>>()
+                new[]
                 {
-                    new KeyValuePair<uint, uint>(60, 1)
+                    new List<KeyValuePair<uint, uint>>()
+                    {
+                        new KeyValuePair<uint, uint>(60, 1)
+                    }
                 },
                 "Распределение результатов"
             )
@@ -198,12 +204,15 @@ namespace QuizData.Analyser.Test
             new ScalarDataBlock(1U, "Всего ответов:"),
             new ScalarDataBlock(3U, "Правильный ответ:"),
             new DistributionDataBlock<uint, uint>(
-                new List<KeyValuePair<uint, uint>>()
+                new[]
                 {
-                    new KeyValuePair<uint, uint>(1, 0),
-                    new KeyValuePair<uint, uint>(2, 0),
-                    new KeyValuePair<uint, uint>(3, 1),
-                    new KeyValuePair<uint, uint>(4, 0),
+                    new List<KeyValuePair<uint, uint>>()
+                    {
+                        new KeyValuePair<uint, uint>(1, 0),
+                        new KeyValuePair<uint, uint>(2, 0),
+                        new KeyValuePair<uint, uint>(3, 1),
+                        new KeyValuePair<uint, uint>(4, 0),
+                    }
                 },
                 "Ответы пользователей"
             ),
@@ -216,12 +225,15 @@ namespace QuizData.Analyser.Test
             new ScalarDataBlock(1U, "Всего ответов:"),
             new ScalarDataBlock(1U, "Правильный ответ:"),
             new DistributionDataBlock<uint, uint>(
-                new List<KeyValuePair<uint, uint>>()
+                new[]
                 {
-                    new KeyValuePair<uint, uint>(1, 0),
-                    new KeyValuePair<uint, uint>(2, 0),
-                    new KeyValuePair<uint, uint>(3, 0),
-                    new KeyValuePair<uint, uint>(4, 1),
+                    new List<KeyValuePair<uint, uint>>()
+                    {
+                        new KeyValuePair<uint, uint>(1, 0),
+                        new KeyValuePair<uint, uint>(2, 0),
+                        new KeyValuePair<uint, uint>(3, 0),
+                        new KeyValuePair<uint, uint>(4, 1),
+                    }
                 },
                 "Ответы пользователей"
             ),
@@ -234,12 +246,15 @@ namespace QuizData.Analyser.Test
             new ScalarDataBlock(1U, "Всего ответов:"),
             new ScalarDataBlock(1U, "Правильный ответ:"),
             new DistributionDataBlock<uint, uint>(
-                new List<KeyValuePair<uint, uint>>()
+                new[]
                 {
-                    new KeyValuePair<uint, uint>(1, 1),
-                    new KeyValuePair<uint, uint>(2, 0),
-                    new KeyValuePair<uint, uint>(3, 0),
-                    new KeyValuePair<uint, uint>(4, 0),
+                    new List<KeyValuePair<uint, uint>>()
+                    {
+                        new KeyValuePair<uint, uint>(1, 1),
+                        new KeyValuePair<uint, uint>(2, 0),
+                        new KeyValuePair<uint, uint>(3, 0),
+                        new KeyValuePair<uint, uint>(4, 0),
+                    }
                 },
                 "Ответы пользователей"
             ),
@@ -252,12 +267,15 @@ namespace QuizData.Analyser.Test
             new ScalarDataBlock(1U, "Всего ответов:"),
             new ScalarDataBlock(3U, "Правильный ответ:"),
             new DistributionDataBlock<uint, uint>(
-                new List<KeyValuePair<uint, uint>>()
+                new[]
                 {
-                    new KeyValuePair<uint, uint>(1, 0),
-                    new KeyValuePair<uint, uint>(2, 0),
-                    new KeyValuePair<uint, uint>(3, 1),
-                    new KeyValuePair<uint, uint>(4, 0),
+                    new List<KeyValuePair<uint, uint>>()
+                    {
+                        new KeyValuePair<uint, uint>(1, 0),
+                        new KeyValuePair<uint, uint>(2, 0),
+                        new KeyValuePair<uint, uint>(3, 1),
+                        new KeyValuePair<uint, uint>(4, 0),
+                    }
                 },
                 "Ответы пользователей"
             ),
@@ -270,12 +288,15 @@ namespace QuizData.Analyser.Test
             new ScalarDataBlock(1U, "Всего ответов:"),
             new ScalarDataBlock(3U, "Правильный ответ:"),
             new DistributionDataBlock<uint, uint>(
-                new List<KeyValuePair<uint, uint>>()
+                new[]
                 {
-                    new KeyValuePair<uint, uint>(1, 1),
-                    new KeyValuePair<uint, uint>(2, 0),
-                    new KeyValuePair<uint, uint>(3, 0),
-                    new KeyValuePair<uint, uint>(4, 0),
+                    new List<KeyValuePair<uint, uint>>()
+                    {
+                        new KeyValuePair<uint, uint>(1, 1),
+                        new KeyValuePair<uint, uint>(2, 0),
+                        new KeyValuePair<uint, uint>(3, 0),
+                        new KeyValuePair<uint, uint>(4, 0),
+                    }
                 },
                 "Ответы пользователей"
             ),
