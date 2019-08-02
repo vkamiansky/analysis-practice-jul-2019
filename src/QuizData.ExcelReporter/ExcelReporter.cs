@@ -92,19 +92,10 @@ namespace QuizData.ExcelReport
                 _temp.WriteLine();
             }
 
-            _temp.CreateChart(db.Title, to, 10, signatureRange, dataRanges);
-
-            if (db.Data.Length > 1)
-            {
-                foreach (eChartType chartType in System.Enum.GetValues(typeof(eChartType)))
-                {
-                    if (chartType.ToString().Contains("Column") && chartType != eChartType.Column3D)
-                    {
-                        _temp.WriteLine(chartType.ToString());
-                        _temp.CreateChart(db.Title, to, 10, signatureRange, dataRanges, chartType);
-                    }
-                }
-            }
+            if (db.Data.Length < 2)
+                _temp.CreateChart(db.Title, to, 10, signatureRange, dataRanges);
+            else
+                _temp.CreateChart(db.Title, to, 10, signatureRange, dataRanges, eChartType.ColumnStacked);
         }
 
         public void WriteDoubleDistributionDataBlock<TKey, TValue>(DoubleDistributionDataBlock<TKey, TValue> db, ExcelWorksheetWrapper to)
