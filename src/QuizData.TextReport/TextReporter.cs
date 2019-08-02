@@ -1,63 +1,92 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.Text;
-using QuizData.Analyser.Models;
+using QuizData.Analyser.Models.DataBlocks;
 
 namespace QuizData.TextReport
 {
-	public class TextReporter
-	{
-		public static void ToStream(Stream stream, DataAnalyserReport report, int bufferSize = 4 * 1024)
-		{
-			using (var writer = new StreamWriter(stream, Encoding.UTF8, bufferSize, true))
-			{
-				writer.WriteLine("Всего тестов: {0}", report.TotalAmountOfTests);
-				writer.WriteLine("Количество уникальных e-mail'ов: {0}\n", report.AmountOfUniqueEmails);
-
-				writer.WriteLine("Распределение попыток:");
-				for (var i = 0; i < report.AttemptDistribution.Length; i++)
-				{
-					if (report.AttemptDistribution[i] != 0)
-						writer.WriteLine("{0}: {1}", i + 1, report.AttemptDistribution[i]);
-				}
-				writer.WriteLine();
-
-				writer.WriteLine("Распределение результатов:");
-				foreach (var el in report.ResultDistribution)
-				{
-					writer.WriteLine("{0}: {1}", el.Key, el.Value);
-				}
-				writer.WriteLine();
-
-				writer.WriteLine("Статистика вопросов:");
-				foreach (var el in report.QuestionStatistics)
-				{
-					writer.WriteLine("Вопрос: {0}\nПравильных ответов: {1}, неправильных: {2}, всего: {3}\n" +
-						"Правильный ответ: {4}, а люди отвечали 0:{5} 1:{6} 2:{7} 3:{8}\n",
-						el.Key, el.Value.RightAnswersAmount, el.Value.WrongAnswersAmount,
-						el.Value.RightAnswersAmount + el.Value.WrongAnswersAmount,
-						el.Value.RightAnswerIndex, el.Value.AnswersDistribution[0], el.Value.AnswersDistribution[1],
-						el.Value.AnswersDistribution[2], el.Value.AnswersDistribution[3]);
-				}
-
-                (var kDistribution, var bDistribution) = report.GetAdditionalInfo();
-                if (kDistribution != null && bDistribution != null)
-                {
-                    writer.WriteLine("Распределение коэффициента K:");
-                    foreach (var el in kDistribution.Intervals)
-                    {
-                        writer.WriteLine("В интервале от {0:F2} и до {1:F2}: {2}",
-                            el.LeftBorder, el.RightBorder, el.NumericsAmount);
-                    }
-                    writer.WriteLine();
-                    writer.WriteLine("Распределение коэффициента B:");
-                    foreach (var el in bDistribution.Intervals)
-                    {
-                        writer.WriteLine("В интервале от {0:F2} и до {1:F2}: {2}",
-                            el.LeftBorder, el.RightBorder, el.NumericsAmount);
-                    }
-                    writer.WriteLine();
-                }
+    public static class TextReporter
+    {
+        public static void WriteDataBlock(IDataBlock dataBlock, StreamWriter writer)
+        {
+            if (dataBlock is ScalarDataBlock scalarDataBlock)
+            {
+                WriteScalarDataBlock(scalarDataBlock, writer);
             }
-		}
-	}
+            else if (dataBlock is DistributionDataBlock<string, uint> doubleDistributionDataBlock)
+            {
+                WriteDistributionDataBlock(doubleDistributionDataBlock, writer);
+            }
+            else if (dataBlock is DistributionDataBlock<uint, uint> uintDistributionDataBlock)
+            {
+                WriteDistributionDataBlock(uintDistributionDataBlock, writer);
+            }
+            else if (dataBlock is DoubleDistributionDataBlock<uint, uint> c)
+            {
+            }
+            else if (dataBlock is DoubleDistributionDataBlock<uint, double?> d)
+            {
+            }
+            else
+            {
+                throw new System.ArgumentException("DataBlock wasn't recognized");
+            }
+        }
+
+        public static void WriteDataBlocks(IEnumerable<IDataBlock> dataBlocks, StreamWriter writer)
+        {
+            foreach (var dataBlock in dataBlocks)
+                WriteDataBlock(dataBlock, writer);
+        }
+
+        public static void WriteScalarDataBlock(ScalarDataBlock dataBlock, StreamWriter writer)
+        {
+            if (!string.IsNullOrEmpty(dataBlock.Caption) && dataBlock.Data != null)
+            {
+                writer.Write(dataBlock.Caption);
+                writer.Write(' ');
+                writer.WriteLine(dataBlock.Data);
+            }
+            else
+            {
+                writer.WriteLine();
+            }
+        }
+
+        public static void WriteDistributionDataBlock<TKey, TValue>(DistributionDataBlock<TKey, TValue> db, StreamWriter writer)
+        {
+            writer.WriteLine();
+            writer.Write(db.Title);
+            writer.WriteLine(":");
+
+            // Write signatures
+            foreach (var pair in db.Data[0])
+            {
+                writer.Write(pair.Key);
+                writer.Write(' ');
+            }
+            writer.WriteLine();
+
+            // Write all distribution data
+            foreach (var dataRow in db.Data)
+            {
+                foreach (var pair in dataRow)
+                {
+                    writer.Write(pair.Value);
+                    writer.Write(' ');
+                }
+                writer.WriteLine();
+            }
+        }
+
+        public static void ToStream(Stream stream, IEnumerable<IDataBlock> mainData, IEnumerable<IDataBlock> questionsData)
+        {
+            using (var writer = new StreamWriter(stream, Encoding.UTF8, bufferSize: 4 * 1024, true))
+            {
+                WriteDataBlocks(mainData, writer);
+                writer.WriteLine();
+                WriteDataBlocks(questionsData, writer);
+            }
+        }
+    }
 }

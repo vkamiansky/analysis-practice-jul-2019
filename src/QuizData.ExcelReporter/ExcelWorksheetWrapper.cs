@@ -1,5 +1,7 @@
 ﻿using OfficeOpenXml;
 using OfficeOpenXml.Drawing.Chart;
+using System;
+using System.Collections.Generic;
 
 namespace QuizData.ExcelReport
 {
@@ -85,24 +87,39 @@ namespace QuizData.ExcelReport
             _pos2Column = CurrentColumn;
         }
 
-        public void CreateChart(string chartName, string chartTitle, int height = 10)
+        public ExcelRange StartRangeHere()
         {
-            CreateChart(chartName, chartTitle, this, height);
+            var result = new ExcelRange(this);
+            result.SetStartPosition(CurrentColumn, CurrentLine);
+            return result;
         }
 
-        public void CreateChart(string chartName, string chartTitle, ExcelWorksheetWrapper to, int height = 10)
+        public void FinishRangeHere(ExcelRange range)
         {
-            var chart = to.Worksheet.Drawings.AddChart(chartName, eChartType.ColumnClustered);
+            if (range.WorkSheet == this)
+                range.SetEndPosition(CurrentColumn, CurrentLine);
+        }
+
+        public void CreateChart(string chartTitle, ExcelWorksheetWrapper to, int height,
+            ExcelRange signaturesRange, IEnumerable<ExcelRange> dataRanges,
+            eChartType chartType = eChartType.ColumnClustered)
+        {
+            var chart = to.Worksheet.Drawings.AddChart(
+                chartTitle + Guid.NewGuid(), chartType);
             chart.Title.Text = chartTitle;
-            var address1 = string.Format("{0}{1}:{2}{3}",
-                (char)(_pos2Column + 64), _pos1Line, (char)(_pos2Column + 64), _pos2Line);
-            var address2 = string.Format("{0}{1}:{2}{3}",
-                (char)(_pos1Column + 64), _pos1Line, (char)(_pos1Column + 64), _pos2Line);
-            chart.Series.Add(ExcelRange.GetFullAddress(Worksheet.Name, address1),
-                ExcelRange.GetFullAddress(Worksheet.Name, address2));
+            
+            foreach (var dataRange in dataRanges)
+            {
+                chart.Series.Add(dataRange, signaturesRange);
+            }
             chart.Legend.Remove();
 
             to.PlaceChart(chart, height);
+        }
+
+        public void Create3DChart(string chartName, string chartTitle, string[] axisTitles, int height = 20)
+        {
+            Create3DChart(chartName, chartTitle, this, axisTitles, height);
         }
 
         public void Create3DChart(string chartName, string chartTitle, ExcelWorksheetWrapper to,
@@ -116,8 +133,8 @@ namespace QuizData.ExcelReport
                     _pos1Line, _pos2Line);
                 var dataAddress = string.Format("{0}{1}:{2}{1}", (char)(_pos1Column + 64 + 1),
                     i, (char)(_pos2Column + 64));
-                var serie = chart.Series.Add(ExcelRange.GetFullAddress(Worksheet.Name, dataAddress),
-                    ExcelRange.GetFullAddress(Worksheet.Name, signaturesAddress));
+                var serie = chart.Series.Add(OfficeOpenXml.ExcelRange.GetFullAddress(Worksheet.Name, dataAddress),
+                    OfficeOpenXml.ExcelRange.GetFullAddress(Worksheet.Name, signaturesAddress));
                 serie.Header = Worksheet.Cells[string.Format("{0}{1}", (char)(_pos1Column + 64), i)].Value.ToString();
             }
             chart.Legend.Position = eLegendPosition.Right;

@@ -33,14 +33,16 @@ namespace QuizData
 			}
 
 			var report = DataAnalyser.Analyze(data, Convert.ToUInt32(config["min-number-for-adv-stat"]));
+            var mainData = report.GetMainData();
+            var questionsData = report.GetQuestionsData();
             using (var stream = new FileStream("report.txt", FileMode.Create))
             {
-                TextReporter.ToStream(stream, report);
+                TextReporter.ToStream(stream, mainData, questionsData);
             }
             var reporter = new ExcelReport.ExcelReporter();
             using (var stream = new FileStream("report.xlsx", FileMode.Create))
             {
-                reporter.ToStream(stream, report);
+                reporter.ToStream(stream, mainData, questionsData);
             }
         }
 	}
